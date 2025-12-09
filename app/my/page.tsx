@@ -1,30 +1,49 @@
-import { redirect } from "next/navigation";
+"use client";
 
-import { createClient } from "@/lib/supabase/server";
-import { Suspense } from "react";
+import { useEffect, useState } from "react";
+import { redirect, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Schedule } from "@/components/schedule";
+import type { User } from "@supabase/supabase-js";
 
-async function UserDetails() {
-	const supabase = await createClient();
-	const { data, error } = await supabase.auth.getUser()
+export default function DashboardPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-	if (error || !data) {
-		redirect("/auth/login");
-	}
+  useEffect(() => {
+    const supabase = createClient();
 
-	// return JSON.stringify(data.claims, null, 2);
-	return data.user;
-}
+    const getUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
 
-export default async function DashboardPage() {
-	const userData = await UserDetails();
-	return (
-		<div className="">
-			<Suspense fallback={<div>Loading...</div>}>
-				{/* {userData.email} */}
+      if (error || !data?.user) {
+        router.push("/auth/login");
+        return;
+      }
 
-				<Schedule group={userData.user_metadata.group} />
-			</Suspense>
-		</div>
-	);
+      setUser(data.user);
+      setLoading(false);
+    };
+
+    getUser();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <div className="">
+      <Schedule group={user.user_metadata?.group} />
+    </div>
+  );
 }

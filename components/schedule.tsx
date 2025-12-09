@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Progress } from "./ui/progress";
 import TimeSteps from "./time-steps";
-import { log } from "console";
 
 interface ScheduleProps {
   className?: string;
