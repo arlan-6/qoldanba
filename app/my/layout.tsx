@@ -1,15 +1,15 @@
 import Navigation from "@/components/navigation";
-import { Hero } from "@/components/hero";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Suspense } from "react";
 
-export default function Home() {
+export default function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-20 items-center">
+    <main className="min-h-screen">
+      <div className="flex-1 w-full ">
         <Suspense
           fallback={
             <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16 bg-background/80 backdrop-blur-md sticky top-0 z-50" />
@@ -17,7 +17,11 @@ export default function Home() {
         >
           <Navigation />
         </Suspense>
-        
+        <div className="">
+          {children}
+        </div>
+
+       
       </div>
     </main>
   );
