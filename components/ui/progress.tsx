@@ -13,42 +13,30 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// Convert linear time percentage (0-100) to match TimeSteps proportional layout
-// TimeSteps layout: [00-05] flex-1.2, [05-19] flex-5, [19-00] flex-1.2
+// Convert time percentage to position on evenly distributed timeline (7-21 hours)
 const convertToProportionalProgress = (linearPercent: number): number => {
   const hour = (linearPercent / 100) * 24;
 
-  // Section boundaries
-  const section1End = 5; // 00-05 (6 hours)
-  const section2End = 19; // 05-19 (14 hours)
-  const section3End = 24; // 19-00 (5 hours)
+  // Fixed range: 7-21 (15 hours total)
+  const start = 7;
+  const end = 21;
+  const totalHours = end - start;
 
-  // Flex proportions
-  const flex1 = 1.2;
-  const flex2 = 5;
-  const flex3 = 1.2;
-  const totalFlex = flex1 + flex2 + flex3;
-
-  if (hour <= section1End) {
-    // In first section (00-05)
-    const sectionProgress = hour / section1End;
-    const sectionWidth = (flex1 / totalFlex) * 100;
-    return sectionProgress * sectionWidth;
-  } else if (hour <= section2End) {
-    // In second section (05-19)
-    const sectionProgress = (hour - section1End) / (section2End - section1End);
-    const section1Width = (flex1 / totalFlex) * 100;
-    const section2Width = (flex2 / totalFlex) * 100;
-    return section1Width + sectionProgress * section2Width;
-  } else {
-    // In third section (19-00)
-    const sectionProgress = (hour - section2End) / (section3End - section2End);
-    const section1Width = (flex1 / totalFlex) * 100;
-    const section2Width = (flex2 / totalFlex) * 100;
-    const section3Width = (flex3 / totalFlex) * 100;
-    return section1Width + section2Width + sectionProgress * section3Width;
+  // If before 7 AM, position at beginning
+  if (hour < start) {
+    return 0;
   }
+
+  // If after 9 PM, position at end
+  if (hour >= end) {
+    return 100;
+  }
+
+  // Linear positioning within the 7-21 range
+  const hoursFromStart = hour - start;
+  return (hoursFromStart / totalHours) * 100;
 };
+
 interface Session {
   time: string;
   type: "lecture" | "practice";
@@ -69,7 +57,7 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
     <ProgressPrimitive.Root
       data-slot="progress"
       className={cn(
-        "bg-primary/20 relative h-4 overflow-hidden rounded-full",
+        "bg-primary/5 relative h-4 overflow-hidden rounded-full",
         // Hardcoded widths for different devices
         "w-[320px]", // Mobile (default)
         "sm:w-[640px]", // Small tablets
@@ -96,11 +84,28 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
 
       <TooltipProvider>
         {sessions?.map((session, index) => {
-          // Extract start time from "08:00-08:50" format
-          const startTime = session.time.split("-")[0]; // "08:00"
-          const proportionalPercent = convertToProportionalProgress(
-            timeStringToPercent(startTime)
+          // Extract times
+          const [startTimeStr, endTimeStr] = session.time.split("-");
+          const startPercent = convertToProportionalProgress(
+            timeStringToPercent(startTimeStr)
           );
+          const endPercent = convertToProportionalProgress(
+            timeStringToPercent(endTimeStr)
+          );
+
+          // Current time position (value is passed from parent Progress component)
+          const currentPercent = proportionalValue; // value is already converted in the component body
+
+          let status: "passed" | "current" | "upcoming" = "upcoming";
+
+          if (currentPercent > endPercent) {
+            status = "passed";
+          } else if (
+            currentPercent >= startPercent &&
+            currentPercent <= endPercent
+          ) {
+            status = "current";
+          }
 
           return (
             <Tooltip key={index}>
@@ -108,14 +113,25 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
                 <ProgressPrimitive.Indicator
                   data-slot="progress-indicator"
                   className={cn(
-                    "absolute my-0.5 h-3 w-12 transition-all duration-200 cursor-pointer rounded-sm",
-                    "hover:scale-110 hover:shadow-lg hover:z-10",
-                    session.type === "lecture"
-                      ? "bg-blue-500 hover:bg-blue-400"
-                      : "bg-emerald-500 hover:bg-emerald-400"
+                    "absolute my-0.5 h-3 w-20 transition-all duration-200 cursor-pointer rounded-sm",
+                    "hover:scale-110 hover:shadow-lg hover:z-20",
+
+                    // Passed sessions: Gray and transparent
+                    status === "passed" &&
+                      "bg-slate-300 dark:bg-slate-700 opacity-40 grayscale hover:grayscale-0 hover:opacity-100",
+
+                    // Current session: Pulsing ring and bright
+                    status === "current" &&
+                      "ring-2 ring-offset-1 ring-lime-500 z-10 animate-pulse",
+
+                    // Upcoming (default) or Current: Type-based colors
+                    status !== "passed" &&
+                      (session.type === "lecture"
+                        ? "bg-blue-500 hover:bg-blue-400"
+                        : "bg-emerald-500 hover:bg-emerald-400")
                   )}
                   style={{
-                    left: `calc(${proportionalPercent}% - 2px)`,
+                    left: `calc(${startPercent}% - 0px)`,
                   }}
                 />
               </TooltipTrigger>
@@ -177,11 +193,13 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
       </TooltipProvider>
 
       {/* Main indicator - invisible but creates the border */}
-      <ProgressPrimitive.Indicator
-        data-slot="progress-indicator"
-        className="bg-red-500/0 h-full w-full flex-1 transition-all border-r-4 border-red-600 pointer-events-none"
-        style={{ transform: `translateX(-${100 - proportionalValue}%)` }}
-      />
+      {proportionalValue > 0 && proportionalValue < 100 && (
+        <ProgressPrimitive.Indicator
+          data-slot="progress-indicator"
+          className="absolute top-0 h-full w-1 bg-lime-500 shadow-[0_0_10px_rgba(132,204,22,0.8)] transition-all pointer-events-none z-20"
+          style={{ left: `calc(${proportionalValue}% - 2px)` }}
+        />
+      )}
     </ProgressPrimitive.Root>
   );
 }
