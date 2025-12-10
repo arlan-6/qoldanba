@@ -1,49 +1,33 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { redirect, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 import { Schedule } from "@/components/schedule";
-import type { User } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+export default async function DashboardPage() {
+  const supabase = await createClient();
 
-  useEffect(() => {
-    const supabase = createClient();
-
-    const getUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-
-      if (error || !data?.user) {
-        router.push("/auth/login");
-        return;
-      }
-
-      setUser(data.user);
-      setLoading(false);
-    };
-
-    getUser();
-  }, [router]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-muted-foreground">Loading...</div>
-      </div>
-    );
-  }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    return null;
+    redirect("/auth/login");
+  }
+
+  // Fetch schedule data on server if user has a group
+  let scheduleData = null;
+  if (user.user_metadata?.group) {
+    const { data } = await supabase
+      .from("schedules")
+      .select("week_schedule")
+      .eq("group_name", user.user_metadata.group.toUpperCase())
+      .single();
+
+    scheduleData = data?.week_schedule;
   }
 
   return (
     <div className="">
-      <Schedule group={user.user_metadata?.group} />
+      <Schedule group={user.user_metadata?.group} initialData={scheduleData} />
     </div>
   );
 }

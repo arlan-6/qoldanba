@@ -11,7 +11,8 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/animate-ui/components/animate/tooltip';
+import { useEffect, useState } from "react";
 
 // Convert time percentage to position on evenly distributed timeline (7-21 hours)
 const convertToProportionalProgress = (linearPercent: number): number => {
@@ -51,8 +52,20 @@ interface ProgressProps
 }
 
 function Progress({ className, value, sessions, ...props }: ProgressProps) {
-  const proportionalValue = convertToProportionalProgress(value || 0);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
+   useEffect(() => {
+    // Set an interval to update the time every second
+    const timerId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000*60*60);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(timerId);
+  }, []);
+  const proportionalValue = convertToProportionalProgress(value || 0);
+  const proportionalValue2 = convertToProportionalProgress(timeStringToPercent(currentTime.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })) || 0);
+  
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
@@ -82,7 +95,8 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
         }}
       /> */}
 
-      <TooltipProvider>
+      <TooltipProvider 
+              transition={{ type: "tween"}}>
         {sessions?.map((session, index) => {
           // Extract times
           const [startTimeStr, endTimeStr] = session.time.split("-");
@@ -108,8 +122,8 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
           }
 
           return (
-            <Tooltip key={index}>
-              <TooltipTrigger asChild>
+            <Tooltip  key={index} >
+              <TooltipTrigger onClick={(e) => e.stopPropagation()} asChild>
                 <ProgressPrimitive.Indicator
                   data-slot="progress-indicator"
                   className={cn(
@@ -137,7 +151,6 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
                 />
               </TooltipTrigger>
               <TooltipContent
-                side="top"
                 className="max-w-sm bg-gradient-to-br from-slate-900 to-slate-800 text-white border-2 border-slate-600 shadow-2xl p-4"
               >
                 <div className="space-y-2.5">
@@ -199,7 +212,7 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
           data-slot="progress-indicator"
           className="animate-pulse duration-1500 absolute top-0 h-full w-1 bg-red-500 shadow-red-500 transition-all z-20"
           style={{ left: `calc(${proportionalValue}% - 2px)` }}
-          title={'Current time '+ new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'})}
+          title={'Current time '+ currentTime.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'})}
         />
       )}
     </ProgressPrimitive.Root>
