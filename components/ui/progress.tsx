@@ -18,8 +18,8 @@ const convertToProportionalProgress = (linearPercent: number): number => {
   const hour = (linearPercent / 100) * 24;
 
   // Fixed range: 7-21 (15 hours total)
-  const start = 7;
-  const end = 21;
+  const start = 6;
+  const end = 20;
   const totalHours = end - start;
 
   // If before 7 AM, position at beginning
@@ -57,14 +57,14 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
     <ProgressPrimitive.Root
       data-slot="progress"
       className={cn(
-        "bg-primary/5 relative h-4 overflow-hidden rounded-full",
+        "bg-primary/5 relative h-4 overflow-hidden rounded-full w-full",
         // Hardcoded widths for different devices
-        "w-[320px]", // Mobile (default)
-        "sm:w-[640px]", // Small tablets
-        "md:w-[768px]", // Tablets
-        "lg:w-[1024px]", // Laptops
-        "xl:w-[1280px]", // Desktops
-        "2xl:w-[1536px]", // Large desktops
+        // "w-[320px]", // Mobile (default)
+        // "sm:w-[640px]", // Small tablets
+        // "md:w-[768px]", // Tablets
+        // "lg:w-[1024px]", // Laptops
+        // "xl:w-[1280px]", // Desktops
+        // "2xl:w-[1536px]", // Large desktops
         className
       )}
       {...props}
@@ -115,6 +115,7 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
                   className={cn(
                     "absolute my-0.5 h-3 w-20 transition-all duration-200 cursor-pointer rounded-sm",
                     "hover:scale-110 hover:shadow-lg hover:z-20",
+                    "w-[5.8%]",
 
                     // Passed sessions: Gray and transparent
                     status === "passed" &&
@@ -196,8 +197,9 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
       {proportionalValue > 0 && proportionalValue < 100 && (
         <ProgressPrimitive.Indicator
           data-slot="progress-indicator"
-          className="absolute top-0 h-full w-1 bg-lime-500 shadow-[0_0_10px_rgba(132,204,22,0.8)] transition-all pointer-events-none z-20"
+          className="animate-pulse duration-1500 absolute top-0 h-full w-1 bg-red-500 shadow-red-500 transition-all z-20"
           style={{ left: `calc(${proportionalValue}% - 2px)` }}
+          title={'Current time '+ new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'})}
         />
       )}
     </ProgressPrimitive.Root>
