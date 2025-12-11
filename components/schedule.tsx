@@ -35,6 +35,16 @@ interface WeekSchedule {
 
 import { getCurrentTimePercent, timeStringToPercent } from "@/lib/time-utils";
 
+const DAYS_ORDER = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
 const getDayName = (date: Date): string => {
   const days = [
     "Sunday",
@@ -46,6 +56,21 @@ const getDayName = (date: Date): string => {
     "Saturday",
   ];
   return days[date.getDay()];
+};
+
+const getWeekNumber = (date: Date): number => {
+  const startOfYear = new Date(date.getFullYear(), 0, 1);
+  const dayOfWeek = startOfYear.getDay();
+  const firstMonday = new Date(
+    startOfYear.getTime() +
+      (dayOfWeek <= 4
+        ? (4 - dayOfWeek) * 24 * 60 * 60 * 1000
+        : (11 - dayOfWeek) * 24 * 60 * 60 * 1000)
+  );
+  const diffInDays = Math.floor(
+    (date.getTime() - firstMonday.getTime()) / (24 * 60 * 60 * 1000)
+  );
+  return Math.ceil((diffInDays + 1) / 7);
 };
 export const Schedule: FC<ScheduleProps> = ({
   className,
@@ -93,7 +118,17 @@ export const Schedule: FC<ScheduleProps> = ({
           return;
         }
 
-        setWeekSchedule(data?.week_schedule || null);
+        if (data?.week_schedule) {
+          const sortedSchedule: WeekSchedule = {};
+          DAYS_ORDER.forEach((day) => {
+            if (data.week_schedule[day]) {
+              sortedSchedule[day] = data.week_schedule[day];
+            }
+          });
+          setWeekSchedule(sortedSchedule);
+        } else {
+          setWeekSchedule(null);
+        }
       } catch (err) {
         if (!active) return;
         console.error("Unexpected error:", err);
@@ -129,9 +164,19 @@ export const Schedule: FC<ScheduleProps> = ({
 
   const todayName = today ? getDayName(today) : "";
   const tomorrowName = tomorrow ? getDayName(tomorrow) : "";
+  const weekNumber = today ? getWeekNumber(today) : "";
 
   const todaySessions = weekSchedule?.[todayName] || [];
   const tomorrowSessions = weekSchedule?.[tomorrowName] || [];
+  const allWeekSessions = weekSchedule
+    ? DAYS_ORDER.map((day) => weekSchedule[day]).filter(
+        (sessions): sessions is Session[] => sessions !== undefined
+      )
+    : [];
+
+  const allWeekSessionsCount = allWeekSessions.reduce((total, day) => {
+    return total + day.length;
+  }, 0);
 
   const currentTimePercent = getCurrentTimePercent();
   const lastSessionEndTime = todaySessions.reduce((max, session) => {
@@ -369,7 +414,28 @@ export const Schedule: FC<ScheduleProps> = ({
             </div>
           </TabsContent>
           <TabsContent value="allWeek" className="p-4">
-            All week
+            <div className="">
+              <h2 className="text-xl mb-0">
+                <span className="text-muted-foreground font-bold shadow-lg">
+                  Week #{weekNumber}
+                </span>
+              </h2>
+              <p className="mb-6">
+                {allWeekSessionsCount === 0 ? (
+                  <span className="text-muted-foreground">No classes</span>
+                ) : (
+                  <span className="text-muted-foreground">
+                    {allWeekSessionsCount} classes in week #{weekNumber}
+                  </span>
+                )}
+              </p>
+              <TimeSteps />
+              <Progress
+                value={0}
+                weekSessions={allWeekSessions}
+                className="w-full bg-white "
+              />
+            </div>
           </TabsContent>
         </TabsContents>
       </Tabs>

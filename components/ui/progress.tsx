@@ -48,9 +48,16 @@ interface Session {
 interface ProgressProps
   extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
   sessions?: Session[];
+  weekSessions?: Session[][];
 }
 
-function Progress({ className, value, sessions, ...props }: ProgressProps) {
+function Progress({
+  className,
+  value,
+  sessions,
+  weekSessions,
+  ...props
+}: ProgressProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -63,20 +70,20 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
     return () => clearInterval(timerId);
   }, []);
   const proportionalValue = convertToProportionalProgress(value || 0);
-  const proportionalValue2 = convertToProportionalProgress(
-    timeStringToPercent(
-      currentTime.toLocaleTimeString("ru-RU", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    ) || 0
-  );
+  // const proportionalValue2 = convertToProportionalProgress(
+  //   timeStringToPercent(
+  //     currentTime.toLocaleTimeString("ru-RU", {
+  //       hour: "2-digit",
+  //       minute: "2-digit",
+  //     })
+  //   ) || 0
+  // );
 
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
       className={cn(
-        "bg-primary/5 relative h-4 overflow-hidden rounded-full w-full",
+        "bg-primary relative h-4 overflow-hidden rounded-full w-full",
         // Hardcoded widths for different devices
         // "w-[320px]", // Mobile (default)
         // "sm:w-[640px]", // Small tablets
@@ -84,6 +91,7 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
         // "lg:w-[1024px]", // Laptops
         // "xl:w-[1280px]", // Desktops
         // "2xl:w-[1536px]", // Large desktops
+        weekSessions && "h-32 rounded-[8px]",
         className
       )}
       {...props}
@@ -202,6 +210,65 @@ function Progress({ className, value, sessions, ...props }: ProgressProps) {
               </div>
             </HoverCardContent>
           </HoverCard>
+        );
+      })}
+
+      {weekSessions?.map((daySessions, index) => {
+        return (
+          <>
+            {daySessions.map((session, i) => {
+              const startPercent = convertToProportionalProgress(
+                timeStringToPercent(session.time.split("-")[0])
+              );
+
+              return (
+                <>
+                  <ProgressPrimitive.Indicator
+                    children={
+                      <span className="text-xs px-2 line-clamp-1">{session.discipline}</span>
+                    }
+                    data-slot="progress-indicator"
+                    className={cn(
+                      "absolute my-0.5 h-4 w-20 transition-all duration-200 cursor-pointer rounded-xl",
+                      "hover:scale-105 hover:shadow-lg hover:z-20 line-clamp-1",
+                      "w-[5.8%] bg-blue-500"
+                    )}
+                    style={{
+                      left: `calc( ${startPercent}% - 0px)`,
+                      top: `calc(${(index * 100) / 6}% )`,
+                    }}
+                  />
+                </>
+              );
+            })}
+            <ProgressPrimitive.Indicator
+              children={
+                <span className="text-xs px-2 line-clamp-1">
+                  {
+                    [
+                      "Monday",
+                      "Tuesday",
+                      "Wednesday",
+                      "Thursday",
+                      "Friday",
+                      "Saturday",
+                      "Sunday",
+                    ][index]
+                  }
+                </span>
+              }
+              data-slot="progress-indicator"
+              className={cn(
+                "absolute my-0.5 h-4 w-32  transition-all duration-200 cursor-pointer rounded-xl",
+                "hover:scale-105 hover:shadow-lg hover:z-20 line-clamp-1",
+                "bg-blue-500"
+              )}
+              style={{
+                left: `2px`,
+                top: `calc(${(index * 100) / 6}% )`,
+              }}
+            />
+          </>
         );
       })}
 

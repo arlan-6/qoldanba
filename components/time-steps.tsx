@@ -12,7 +12,7 @@ interface Session {
 }
 
 interface TimeStepsProps {
-  daySchedule: Session[];
+  daySchedule?: Session[];
 }
 
 const TimeSteps: React.FC<TimeStepsProps> = ({ daySchedule }) => {
