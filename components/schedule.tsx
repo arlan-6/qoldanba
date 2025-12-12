@@ -440,8 +440,8 @@ export const Schedule: FC<ScheduleProps> = ({
 								)}
 							</p>
 							<ScrollArea>
-								<div className="min-w-[44rem] pt-4">
-									<TimeSteps />
+								<div className="min-w-[68rem] pt-4 pl-4">
+									<TimeSteps showALL/>
 									<Progress
 										value={0}
 										weekSessions={allWeekSessions}

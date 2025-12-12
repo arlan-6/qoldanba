@@ -13,9 +13,10 @@ interface Session {
 
 interface TimeStepsProps {
   daySchedule?: Session[];
+  showALL?: boolean;
 }
 
-const TimeSteps: React.FC<TimeStepsProps> = ({ daySchedule }) => {
+const TimeSteps: React.FC<TimeStepsProps> = ({ daySchedule,showALL }) => {
   // All hours from 7 to 21
   const hours = [
     "06",
@@ -50,7 +51,7 @@ const TimeSteps: React.FC<TimeStepsProps> = ({ daySchedule }) => {
     >
       {hours.map((hour, index) => {
         const hourNumber = parseInt(hour);
-        const isOddHour = hourNumber % 2 !== 0 && hour !== "06" && hour !== "20";
+        const isOddHour = showALL?false: hourNumber % 2 !== 0 && hour !== "06" && hour !== "20";
         return(
         <div key={index} className="flex flex-col items-center">
           <span
