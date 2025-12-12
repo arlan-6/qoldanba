@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   if (events.length === 0) {
     return NextResponse.json({ message: 'No VEVENTs found in ICS' });
   }
-  console.log(events);
+  // console.log(events);
   
   // 5) Map to deadlines rows
   const rows = events

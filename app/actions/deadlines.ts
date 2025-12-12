@@ -28,7 +28,7 @@ export async function syncDeadlines(icsUrl: string) {
       const [subject, lecturer] = categories.split('|').map((s) => s.trim());
       const title = ev.SUMMARY ?? 'Untitled';
       const eventType = detectEventType(title);
-      console.log(ev.SUMMARY);
+      // console.log(ev.SUMMARY);
       
       return {
         user_id: user.id,
