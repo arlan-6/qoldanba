@@ -215,14 +215,14 @@ function Progress({
 
       {weekSessions?.map((daySessions, index) => {
         return (
-          <>
+          <div key={index}>
             {daySessions.map((session, i) => {
               const startPercent = convertToProportionalProgress(
                 timeStringToPercent(session.time.split("-")[0])
               );
 
               return (
-                <>
+                <div key={i}>
                   <ProgressPrimitive.Indicator
                     children={
                       <span className="text-xs px-2 line-clamp-1">{session.discipline}</span>
@@ -238,7 +238,7 @@ function Progress({
                       top: `calc(${(index * 100) / 6}% )`,
                     }}
                   />
-                </>
+                </div>
               );
             })}
             <ProgressPrimitive.Indicator
@@ -259,7 +259,7 @@ function Progress({
               }
               data-slot="progress-indicator"
               className={cn(
-                "absolute my-0.5 h-4 w-32  transition-all duration-200 cursor-pointer rounded-xl",
+                "absolute my-0.5 h-4 w-20 sm:24 lg:w-32  transition-all duration-200 cursor-pointer rounded-xl",
                 "hover:scale-105 hover:shadow-lg hover:z-20 line-clamp-1",
                 "bg-blue-500"
               )}
@@ -268,7 +268,7 @@ function Progress({
                 top: `calc(${(index * 100) / 6}% )`,
               }}
             />
-          </>
+          </div>
         );
       })}
 
