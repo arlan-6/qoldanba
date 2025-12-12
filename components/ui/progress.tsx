@@ -122,7 +122,7 @@ function Progress({
         // Current time position (value is passed from parent Progress component)
         const currentPercent = proportionalValue; // value is already converted in the component body
 
-        let status: "passed" | "current" | "upcoming" = "upcoming";
+        let status: "passed" | "current" | "upcoming"  |"online"= "upcoming";
 
         if (currentPercent > endPercent) {
           status = "passed";
@@ -131,6 +131,9 @@ function Progress({
           currentPercent <= endPercent
         ) {
           status = "current";
+        }
+        if(session.classroom==="Online"){
+          status="online"
         }
 
         return (
@@ -150,11 +153,12 @@ function Progress({
                   // Current session: Pulsing ring and bright
                   status === "current" &&
                     "ring-2 ring-offset-1 ring-lime-500 z-10 animate-pulse",
-
+                  status==="online"&&
+                  "bg-purple-500 hover:bg-purple-400",
                   // Upcoming (default) or Current: Type-based colors
                   status !== "passed" &&
-                    (session.type === "lecture"
-                      ? "bg-blue-500 hover:bg-blue-400"
+                    (session.classroom === "online"
+                      ? "bg-blue-500 hover:bg-blue-400 "
                       : "bg-emerald-500 hover:bg-emerald-400")
                 )}
                 style={{

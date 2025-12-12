@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { dayCountUntillToday } from "@/lib/time-utils";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { motion } from "motion/react";
+import Link from "next/link";
 
 const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 	const [showExams, setShowExams] = React.useState(true);
@@ -52,11 +53,14 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 
 	return (
 		<div className="p-6">
-			<div className="flex  flex-wrap items-center justify-between">
-				<h1 className="text-2xl font-bold mb-6">
-					Upcoming Deadlines ({filteredDeadlines.length})
-				</h1>
-				<div className="flex items-center gap-2">
+			<div className="flex  flex-wrap items-center justify-between mb-6">
+				<div className="flex flex-wrap gap-2 md:gap-6 items-end">
+					<h1 className="text-2xl font-bold ">
+						Upcoming Deadlines ({filteredDeadlines.length})
+					</h1>
+					<Link className="text-sm line-clamp-1 underline" href={"https://lms.astanait.edu.kz/my/"}>LMS dashboard (click)</Link>
+				</div>
+				<div className="flex items-center gap-2 pt-4">
 					<ToggleGroup
 						defaultValue={["assignment", "quiz", "deadline", "exam"]}
 						type="multiple"
@@ -66,86 +70,94 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 					>
 						<motion.div
 							whileHover={{ y: -10 }}
-                            whileTap={{scale:0.9}}
+							whileTap={{ scale: 0.9 }}
 							transition={{
 								// delay: 0.5 * i,
 								type: "spring",
 								stiffness: 200,
 								duration: 0.1,
 							}}
-                            initial={{scale:0.8}}
-                            animate={{y:0,scale:1}}
+							initial={{ scale: 0.8 }}
+							animate={{ y: 0, scale: 1 }}
 						>
 							<ToggleGroupItem
 								variant={!showExams ? "default" : "outline"}
-								className={cn(!showExams && "line-through", "text-md m-2")}
+								className={cn(!showExams && "line-through", "text-md mx-1 md:m-2")}
 								aria-label="exam"
 								value="exam"
 							>
 								exam
 							</ToggleGroupItem>
 						</motion.div>
-                        <motion.div
+						<motion.div
 							whileHover={{ y: -10 }}
-                            whileTap={{scale:0.9}}
+							whileTap={{ scale: 0.9 }}
 							transition={{
 								// delay: 0.5 * i,
 								type: "spring",
 								stiffness: 200,
 								duration: 0.1,
 							}}
-                            initial={{scale:0.8}}
-                            animate={{y:0,scale:1}}
+							initial={{ scale: 0.8 }}
+							animate={{ y: 0, scale: 1 }}
 						>
-						<ToggleGroupItem
-							variant={!showAssignments ? "default" : "outline"}
-							className={cn(!showAssignments && "line-through", "text-md m-2")}
-							aria-label="assignment"
-							value="assignment"
-						>
-							assignment
-						</ToggleGroupItem></motion.div><motion.div
+							<ToggleGroupItem
+								variant={!showAssignments ? "default" : "outline"}
+								className={cn(
+									!showAssignments && "line-through",
+									"text-md mx-1 md:m-2",
+								)}
+								aria-label="assignment"
+								value="assignment"
+							>
+								assignment
+							</ToggleGroupItem>
+						</motion.div>
+						<motion.div
 							whileHover={{ y: -10 }}
-                            whileTap={{scale:0.9}}
+							whileTap={{ scale: 0.9 }}
 							transition={{
 								// delay: 0.5 * i,
 								type: "spring",
 								stiffness: 200,
 								duration: 0.1,
 							}}
-                            initial={{scale:0.8}}
-                            animate={{y:0,scale:1}}
+							initial={{ scale: 0.8 }}
+							animate={{ y: 0, scale: 1 }}
 						>
-						<ToggleGroupItem
-							variant={!showQuizzes ? "default" : "outline"}
-							className={cn(!showQuizzes && "line-through", "text-md m-2")}
-							aria-label="quiz"
-							value="quiz"
-						>
-							quiz
-						</ToggleGroupItem></motion.div><motion.div
+							<ToggleGroupItem
+								variant={!showQuizzes ? "default" : "outline"}
+								className={cn(!showQuizzes && "line-through", "text-md mx-1 md:m-2")}
+								aria-label="quiz"
+								value="quiz"
+							>
+								quiz
+							</ToggleGroupItem>
+						</motion.div>
+						<motion.div
 							whileHover={{ y: -10 }}
-                            whileTap={{scale:0.9}}
+							whileTap={{ scale: 0.9 }}
 							transition={{
 								// delay: 0.5 * i,
 								type: "spring",
 								stiffness: 200,
 								duration: 0.1,
 							}}
-                            initial={{scale:0.8}}
-                            animate={{y:0,scale:1}}
+							initial={{ scale: 0.8 }}
+							animate={{ y: 0, scale: 1 }}
 						>
-						<ToggleGroupItem
-							variant={!showDeadlines ? "default" : "outline"}
-							className={cn(!showDeadlines && "line-through", "text-md m-2")}
-							aria-label="deadline"
-							value="deadline"
-						>
-							deadline
-						</ToggleGroupItem></motion.div>
+							<ToggleGroupItem
+								variant={!showDeadlines ? "default" : "outline"}
+								className={cn(!showDeadlines && "line-through", "text-md mx-1 md:m-2")}
+								aria-label="deadline"
+								value="deadline"
+							>
+								deadline
+							</ToggleGroupItem>
+						</motion.div>
 					</ToggleGroup>
 					<Tooltip>
-						<TooltipTrigger asChild className="cursor-help">
+						<TooltipTrigger asChild className="cursor-help hidden md:block">
 							<Badge variant={"outline"}>?</Badge>
 						</TooltipTrigger>
 						<TooltipContent

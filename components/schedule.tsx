@@ -36,6 +36,8 @@ interface WeekSchedule {
 import { getCurrentTimePercent, timeStringToPercent } from "@/lib/time-utils";
 import { Badge } from "./ui/badge";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { Tooltip, TooltipContent } from "./ui/tooltip";
+import { TooltipTrigger } from "@radix-ui/react-tooltip";
 
 const DAYS_ORDER = [
 	"Monday",
@@ -207,23 +209,60 @@ export const Schedule: FC<ScheduleProps> = ({
 		<div className={cn("space-y-8 m-6 lg:m-10 ", className)}>
 			<h1 className="text-2xl font-bold">Schedule</h1>
 			<Tabs defaultValue="today">
-				<TabsList>
-					<TabsTrigger className="lg:text-lg" value="today">
-						Today <span className="lg:block hidden">- {todayName}</span>
-					</TabsTrigger>
-					<TabsTrigger className="lg:text-lg" value="tomorrow">
-						Tomorrow <span className="lg:block hidden">- {tomorrowName}</span>
-					</TabsTrigger>
-					<TabsTrigger className="lg:text-lg" value="allWeek">
-						All Week{" "}
-						<Badge
-							title="work in progress"
-							className="bg-destructive"
-							variant={"outline"}
-						>
-							WIP
-						</Badge>
-					</TabsTrigger>
+				<TabsList className="w-full flex items-center justify-between">
+					<div className=" flex items-center justify-start">
+						<TabsTrigger className="lg:text-lg" value="today">
+							Today <span className="lg:block hidden">- {todayName}</span>
+						</TabsTrigger>
+						<TabsTrigger className="lg:text-lg" value="tomorrow">
+							Tomorrow <span className="lg:block hidden">- {tomorrowName}</span>
+						</TabsTrigger>
+						<TabsTrigger className="lg:text-lg" value="allWeek">
+							All Week{" "}
+							<Badge
+								title="work in progress"
+								className="bg-destructive"
+								variant={"outline"}
+							>
+								WIP
+							</Badge>
+						</TabsTrigger>
+					</div>
+						<Tooltip>
+							<TooltipTrigger asChild className="cursor-help hidden md:block">
+								<Badge variant={"outline"}>?</Badge>
+							</TooltipTrigger>
+							<TooltipContent
+								side="left"
+								className="bg-black/70 border p-2 cursor-help"
+							>
+								<div>
+									<span
+										className={cn(
+											"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
+											// session.type === "lecture"
+											"bg-blue-500 text-white",
+											// : "bg-emerald-500 text-white",
+										)}
+									>
+										online
+									</span>{" "}
+									 - Online class <br />
+									<span
+										className={cn(
+											"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
+											// session.type === "lecture"
+											// "bg-blue-500 text-white",
+											"bg-emerald-500 text-white",
+										)}
+									>
+										University
+									</span>{" "}
+									 - Ofline class <br />
+									{/* <Badge variant={"outline"}>other</Badge> - Other */}
+								</div>
+							</TooltipContent>
+						</Tooltip>
 				</TabsList>
 				<TabsContents>
 					<TabsContent value="today" className="p-4">
@@ -306,7 +345,7 @@ export const Schedule: FC<ScheduleProps> = ({
 														<span
 															className={cn(
 																"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
-																session.type === "lecture"
+																session.classroom === "online"
 																	? "bg-blue-500 text-white"
 																	: "bg-emerald-500 text-white",
 															)}
@@ -407,11 +446,11 @@ export const Schedule: FC<ScheduleProps> = ({
 													</span>
 													<span
 														className={cn(
-															"ml-auto px-2 py-0.5 rounded-full text-xs font-semibold uppercase",
-															session.type === "lecture"
-																? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-																: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-														)}
+																"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
+																session.classroom === "online"
+																	? "bg-blue-500 text-white"
+																	: "bg-emerald-500 text-white",
+															)}
 													>
 														{session.type}
 													</span>
@@ -441,14 +480,14 @@ export const Schedule: FC<ScheduleProps> = ({
 							</p>
 							<ScrollArea className="rounded-[8px]">
 								<div className="min-w-[68rem] pt-4 pl-4">
-									<TimeSteps showALL/>
+									<TimeSteps showALL />
 									<Progress
 										value={0}
 										weekSessions={allWeekSessions}
 										className="w-full min-w-96  bg-white "
 									/>
 								</div>
-                <ScrollBar orientation="horizontal" />
+								<ScrollBar orientation="horizontal" />
 							</ScrollArea>
 						</div>
 					</TabsContent>
