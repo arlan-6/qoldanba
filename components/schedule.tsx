@@ -439,7 +439,7 @@ export const Schedule: FC<ScheduleProps> = ({
 									</span>
 								)}
 							</p>
-							<ScrollArea>
+							<ScrollArea className="rounded-[8px]">
 								<div className="min-w-[68rem] pt-4 pl-4">
 									<TimeSteps showALL/>
 									<Progress

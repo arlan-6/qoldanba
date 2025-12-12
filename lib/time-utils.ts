@@ -5,7 +5,7 @@
  * @returns Percentage of the day (0-100)
  */
 export const timeToPercent = (hours: number, minutes: number = 0): number => {
-  return ((hours / 24) * 100) + ((minutes / 60 / 24) * 100);
+	return (hours / 24) * 100 + (minutes / 60 / 24) * 100;
 };
 
 /**
@@ -13,8 +13,8 @@ export const timeToPercent = (hours: number, minutes: number = 0): number => {
  * @returns Current time as percentage (0-100)
  */
 export const getCurrentTimePercent = (): number => {
-  const now = new Date();
-  return timeToPercent(now.getHours(), now.getMinutes());
+	const now = new Date();
+	return timeToPercent(now.getHours(), now.getMinutes());
 };
 
 /**
@@ -23,6 +23,31 @@ export const getCurrentTimePercent = (): number => {
  * @returns Percentage of the day (0-100)
  */
 export const timeStringToPercent = (timeString: string): number => {
-  const [hours, minutes] = timeString.split(":").map(Number);
-  return timeToPercent(hours, minutes);
+	const [hours, minutes] = timeString.split(":").map(Number);
+	return timeToPercent(hours, minutes);
+};
+
+export const dateCountUntillTodayToPercent = (date: Date): number => {
+	const now = new Date();
+	const totalDuration = date.getTime() - now.getTime();
+	const elapsedDuration = now.getTime() - date.getTime();
+	return (elapsedDuration / totalDuration) * 100;
+};
+
+export const dayCountUntillToday = (date: Date): string => {
+	const now = new Date();
+	const diff = date.getTime() - now.getTime();
+
+	if (diff <= 0) return "Overdue";
+
+	const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+	const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+	const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+	const parts = [];
+	if (days > 0) parts.push(`${days}d`);
+	if (hours > 0) parts.push(`${hours}h`);
+	parts.push(`${minutes}min`);
+
+	return parts.join(" ");
 };
