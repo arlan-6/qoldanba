@@ -1,15 +1,25 @@
 import Navigation from "@/components/navigation";
-import { Hero } from "@/components/hero";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import LandingPage from "@/components/landing-page"; // Import the client component
 import { Suspense } from "react";
+import { Metadata } from "next";
+
+// Define SEO Metadata here
+export const metadata: Metadata = {
+  title: "Qoldanba - Intelligent Academic Autopilot",
+  description: "Centralize your university life. Auto-sync deadlines from LMS and view your class schedule in one dashboard.",
+  openGraph: {
+    title: "Qoldanba",
+    description: "The intelligent academic autopilot for modern students.",
+    type: "website",
+  },
+};
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-20 items-center">
+    <main className="min-h-screen flex flex-col items-center bg-background">
+      <div className="flex-1 w-full flex flex-col items-center">
+        
+        {/* Navigation wrapped in Suspense (as requested) */}
         <Suspense
           fallback={
             <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16 bg-background/80 backdrop-blur-md sticky top-0 z-50" />
@@ -17,6 +27,9 @@ export default function Home() {
         >
           <Navigation />
         </Suspense>
+
+        {/* The Animated Client Component */}
+        <LandingPage />
         
       </div>
     </main>

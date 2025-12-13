@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { AuthButton } from "@/components/auth-button";
@@ -19,33 +18,50 @@ export default async function Navigation() {
     } = await supabase.auth.getUser();
 
     return (
-        <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16 bg-background/80 backdrop-blur-md sticky top-0 z-50">
+        // [Modern UI Change 1: Electric Dark Theme] Change background to near-black/transparent glass
+        <nav className="w-full flex justify-center border-b border-primary/20 h-16 bg-black/40 backdrop-blur-lg sticky top-0 z-50 transition-colors duration-300">
             <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-                <div className="flex gap-5 items-center font-semibold">
-                    <Link href={"/"} className="text-2xl " style={{ fontFamily: fugaz_one.style.fontFamily }}>
+                <div className="flex gap-8 items-center font-semibold"> {/* Increased gap for clean separation */}
+                    {/* [Modern UI Change 2: Branding Accent] Use primary color for the logo */}
+                    <Link 
+                        href={"/"} 
+                        className="text-2xl text-primary tracking-widest transition-colors hover:text-white" 
+                        style={{ fontFamily: fugaz_one.style.fontFamily }}
+                    >
                         Qoldanba
                     </Link>
-                    <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-                        <Link href="/" className="transition-colors hover:text-foreground">
+
+                    {/* Navigation Links */}
+                    <div className="hidden md:flex items-center gap-6 text-sm font-light text-gray-300"> {/* Lightened font weight */}
+                        <Link 
+                            href="/" 
+                            className="transition-colors hover:text-primary hover:font-normal" // Highlight with Primary on hover
+                        >
                             Home
                         </Link>
-                        <Link href="/about" className="transition-colors hover:text-foreground">
-                            About
+                        <Link 
+                            href="#features" 
+                            className="transition-colors hover:text-primary hover:font-normal"
+                        >
+                            Features
                         </Link>
-                        <Link href="/contact" className="transition-colors hover:text-foreground">
-                            Contact
-                        </Link>
+                        
                         {user && (
                             <Link
                                 href="/my"
-                                className="transition-colors hover:text-foreground"
+                                className="transition-colors hover:text-primary hover:font-normal"
                             >
                                 Dashboard
                             </Link>
                         )}
                     </div>
                 </div>
+
+                {/* Actions: AuthButton & ThemeSwitcher */}
                 <div className="flex items-center gap-4">
+                    {/* Note: The AuthButton component style might need adjustment 
+                        to fit the electric dark theme (e.g., if it uses the default 
+                        Shadcn/ui primary button, it should become primary/outline). */}
                     {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
                     <ThemeSwitcher />
                 </div>
