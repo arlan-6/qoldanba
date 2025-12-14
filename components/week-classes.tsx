@@ -3,14 +3,12 @@ import { cn } from "@/lib/utils";
 import {
 	Table,
 	TableBody,
-	TableCaption,
 	TableCell,
-	TableFooter,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { time } from "console";
+import { Badge } from "./ui/badge";
 
 interface Session {
 	time: string;
@@ -29,8 +27,6 @@ export const WeekClasses: FC<WeekClassesProps> = ({
 	allWeekSessions,
 }) => {
 	const timeSlots = [
-		// "06:00-07:00",
-		// "07:00-08:00",
 		"08:00-08:50",
 		"09:00-09:50",
 		"10:00-10:50",
@@ -45,50 +41,62 @@ export const WeekClasses: FC<WeekClassesProps> = ({
 		"19:00-19:50",
 		"20:00-20:50",
 	];
-	console.log(allWeekSessions);
+
+	const weekdays = [
+		"Monday",
+		"Tuesday",
+		"Wednesday",
+		"Thursday",
+		"Friday",
+		"Saturday",
+	];
 
 	return (
 		<div className={cn("", className)}>
 			<Table className="text-xs md:text-sm">
 				<TableHeader>
 					<TableRow className="bg-accent">
-						<TableHead className="">Week day</TableHead>
-						{timeSlots.map((slot, index) => (
-							<TableHead key={index}>{slot}</TableHead>
+						<TableHead>Time</TableHead>
+						{weekdays.map((day, i) => (
+							<TableHead key={i}>{day}</TableHead>
 						))}
 					</TableRow>
 				</TableHeader>
+
 				<TableBody>
-					{allWeekSessions.map((sessionDay, i) => (
-						<TableRow key={i}>
+					{timeSlots.map((slot, rowIdx) => (
+						<TableRow key={rowIdx}>
 							<TableCell className="font-medium bg-accent text-xs md:text-sm">
-								{
-									[
-										"Monday",
-										"Tuesday",
-										"Wednesday",
-										"Thursday",
-										"Friday",
-										"Saturday",
-										"Sunday",
-									][i]
-								}
+								{slot}
 							</TableCell>
-							{timeSlots.map((slot, j) => {
+							{allWeekSessions.map((sessionDay, dayIdx) => {
 								const session = sessionDay.find((s) => s.time === slot);
 								return (
-									<TableCell key={j}>
+									<TableCell
+										key={dayIdx}
+										className={dayIdx % 2 == 1 ? "bg-muted/50" : ""}
+									>
 										{session ? (
-											<div className="">
+											<div>
 												<div className="font-medium text-xs md:text-sm">
 													{session.discipline}
 												</div>
 												<div className="flex flex-col text-xs md:text-sm text-muted-foreground gap-1">
 													<div>
-														{session.lecturer[0]}{" "}
+														{session.lecturer[0]}
 														{session.lecturer.length > 1 && ", ..."}
 													</div>
-													<div>{session.classroom}</div>
+													<div>
+														{/* {session.classroom}{" "} */}
+														{session.classroom === "online" ? (
+															<Badge variant={"secondary"}>Online</Badge>
+														) : (
+															<div className="flex gap-1 items-center">
+																{session.classroom}{" "}
+																<Badge variant={session.type==='practice'?'default2':'default'}>{session.type}</Badge>{" "}
+															</div>
+														)}
+													</div>
 												</div>
 											</div>
 										) : (
