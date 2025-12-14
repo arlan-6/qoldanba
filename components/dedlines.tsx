@@ -81,7 +81,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 							animate={{ y: 0, scale: 1 }}
 						>
 							<ToggleGroupItem
-								variant={!showExams ? "default" : "outline-solid"}
+								variant={!showDeadlines ? "default" : "outline"}
 								className={cn(!showExams && "line-through", "text-md mx-1 md:m-2")}
 								aria-label="exam"
 								value="exam"
@@ -102,7 +102,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 							animate={{ y: 0, scale: 1 }}
 						>
 							<ToggleGroupItem
-								variant={!showAssignments ? "default" : "outline-solid"}
+								variant={!showDeadlines ? "default" : "outline"}
 								className={cn(
 									!showAssignments && "line-through",
 									"text-md mx-1 md:m-2",
@@ -126,7 +126,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 							animate={{ y: 0, scale: 1 }}
 						>
 							<ToggleGroupItem
-								variant={!showQuizzes ? "default" : "outline-solid"}
+								variant={!showDeadlines ? "default" : "outline"}
 								className={cn(!showQuizzes && "line-through", "text-md mx-1 md:m-2")}
 								aria-label="quiz"
 								value="quiz"
@@ -147,7 +147,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 							animate={{ y: 0, scale: 1 }}
 						>
 							<ToggleGroupItem
-								variant={!showDeadlines ? "default" : "outline-solid"}
+								variant={!showDeadlines ? "default" : "outline"}
 								className={cn(!showDeadlines && "line-through", "text-md mx-1 md:m-2")}
 								aria-label="deadline"
 								value="deadline"
@@ -281,16 +281,16 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 
 function getBadgeVariant(
 	type: string,
-): "default" | "secondary" | "destructive" | "outline-solid" {
+): "default" | "secondary" | "destructive" | "outline" {
 	switch (type?.toLowerCase()) {
 		case "exam":
-			return "outline-solid";
+			return "outline";
 		case "assignment":
-			return "outline-solid";
+			return "outline";
 		case "quiz":
-			return "outline-solid";
+			return "outline";
 		default:
-			return "outline-solid";
+			return "outline";
 	}
 }
 
