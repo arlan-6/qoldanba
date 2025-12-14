@@ -7,56 +7,61 @@ import Deadlines from "@/components/dedlines";
 // export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-	const supabase = await createClient();
+  const supabase = await createClient();
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-	if (!user) {
-		redirect("/auth/login");
-	}
+  if (!user) {
+    redirect("/auth/login");
+  }
 
-	// Fetch schedule data on server if user has a group
-	let scheduleData = null;
-	if (user.user_metadata?.group) {
-		const { data } = await supabase
-			.from("schedules")
-			.select("week_schedule")
-			.eq("group_name", user.user_metadata.group.toUpperCase())
-			.single();
+  // Parallel fetch: schedule + initial deadlines
+  const schedulePromise = user.user_metadata?.group
+    ? supabase
+        .from("schedules")
+        .select("week_schedule")
+        .eq("group_name", user.user_metadata.group.toUpperCase())
+        .single()
+    : Promise.resolve({ data: null });
 
-		scheduleData = data?.week_schedule;
-	}
+  const deadlinesPromise = getDeadlines();
 
-	let deadlines = await getDeadlines();
+  const [scheduleResult, initialDeadlines] = await Promise.all([
+    schedulePromise,
+    deadlinesPromise,
+  ]);
 
-	const lastSync =
-		deadlines.length > 0
-			? new Date(
-					Math.max(
-						...deadlines.map((d: any) => new Date(d.updated_at).getTime()),
-					),
-			  )
-			: null;
+  const scheduleData = scheduleResult.data?.week_schedule;
+  let deadlines = initialDeadlines;
 
-	const shouldSync = !lastSync || Date.now() - lastSync.getTime() > 3600 * 1000;
+  const lastSync =
+    deadlines.length > 0
+      ? new Date(
+          Math.max(
+            ...deadlines.map((d: any) => new Date(d.updated_at).getTime())
+          )
+        )
+      : null;
 
-	if (user.user_metadata?.icsLink && shouldSync) {
-		// Sync logic handled by server action
-		await syncDeadlines(user.user_metadata.icsLink);
-		deadlines = await getDeadlines();
-	}
+  const shouldSync = !lastSync || Date.now() - lastSync.getTime() > 3600 * 1000;
 
-	// console.log(deadlines);
-	return (
-		<div className="">
-			<Schedule group={user.user_metadata?.group} initialData={scheduleData} />
-			{deadlines.length > 0 ? (
-				<Deadlines deadlines={deadlines} />
-			) : (
-				<p>No deadlines available.</p>
-			)}
-		</div>
-	);
+  if (user.user_metadata?.icsLink && shouldSync) {
+    // Sync logic handled by server action
+    await syncDeadlines(user.user_metadata.icsLink);
+    deadlines = await getDeadlines();
+  }
+
+  // console.log(deadlines);
+  return (
+    <div className="">
+      <Schedule group={user.user_metadata?.group} initialData={scheduleData} />
+      {deadlines.length > 0 ? (
+        <Deadlines deadlines={deadlines} />
+      ) : (
+        <p>No deadlines available.</p>
+      )}
+    </div>
+  );
 }
