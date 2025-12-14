@@ -220,13 +220,7 @@ export const Schedule: FC<ScheduleProps> = ({
 						</TabsTrigger>
 						<TabsTrigger className="lg:text-lg" value="allWeek">
 							All Week{" "}
-							<Badge
-								title="work in progress"
-								className="bg-destructive"
-								variant={"outline"}
-							>
-								WIP
-							</Badge>
+							
 						</TabsTrigger>
 					</div>
 					<Tooltip>

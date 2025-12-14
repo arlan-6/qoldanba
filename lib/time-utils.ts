@@ -34,7 +34,10 @@ export const dateCountUntillTodayToPercent = (date: Date): number => {
 	return (elapsedDuration / totalDuration) * 100;
 };
 
-export const dayCountUntillToday = (date: Date): string => {
+export const dayCountUntillToday = (
+	date: Date,
+	lessThat?: 1 | 7,
+): string | boolean => {
 	const now = new Date();
 	const diff = date.getTime() - now.getTime();
 
@@ -43,7 +46,15 @@ export const dayCountUntillToday = (date: Date): string => {
 	const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 	const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 	const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+	if (lessThat) {
+		if (lessThat === 1 && days === 0) {
+			return true;
+		} else if (lessThat === 7 && days < 7) {
+			return true;
+		}
 
+		return false;
+	}
 	const parts = [];
 	if (days > 0) parts.push(`${days}d`);
 	if (hours > 0) parts.push(`${hours}h`);

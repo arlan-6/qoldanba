@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { format, set } from "date-fns";
-import { Calendar, Clock, User } from "lucide-react";
+import { AlertOctagon, Calendar, Clock, Flag, User } from "lucide-react";
 import {
 	Tooltip,
 	TooltipContent,
@@ -58,7 +58,12 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 					<h1 className="text-2xl font-bold ">
 						Upcoming Deadlines ({filteredDeadlines.length})
 					</h1>
-					<Link className="text-sm line-clamp-1 underline" href={"https://lms.astanait.edu.kz/my/"}>LMS dashboard (click)</Link>
+					<Link
+						className="text-sm line-clamp-1 underline"
+						href={"https://lms.astanait.edu.kz/my/"}
+					>
+						LMS dashboard (click)
+					</Link>
 				</div>
 				<div className="flex items-center gap-2 pt-4">
 					<ToggleGroup
@@ -82,7 +87,10 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 						>
 							<ToggleGroupItem
 								variant={!showDeadlines ? "default" : "outline"}
-								className={cn(!showExams && "line-through", "text-md mx-1 md:m-2")}
+								className={cn(
+									!showExams && "line-through",
+									"text-md mx-1 md:m-2",
+								)}
 								aria-label="exam"
 								value="exam"
 							>
@@ -127,7 +135,10 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 						>
 							<ToggleGroupItem
 								variant={!showDeadlines ? "default" : "outline"}
-								className={cn(!showQuizzes && "line-through", "text-md mx-1 md:m-2")}
+								className={cn(
+									!showQuizzes && "line-through",
+									"text-md mx-1 md:m-2",
+								)}
 								aria-label="quiz"
 								value="quiz"
 							>
@@ -148,7 +159,10 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 						>
 							<ToggleGroupItem
 								variant={!showDeadlines ? "default" : "outline"}
-								className={cn(!showDeadlines && "line-through", "text-md mx-1 md:m-2")}
+								className={cn(
+									!showDeadlines && "line-through",
+									"text-md mx-1 md:m-2",
+								)}
 								aria-label="deadline"
 								value="deadline"
 							>
@@ -166,13 +180,13 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 						>
 							<div>
 								<p>Filters</p>
-								<Badge variant={"outline"}>exam</Badge> - Final, Midterm,
+								<Badge variant={"default"}>exam</Badge> - Final, Midterm,
 								Endterm&nbsp; &nbsp; <br />
-								<Badge variant={"outline"}>homework</Badge> - Assignment,
+								<Badge variant={"default"}>homework</Badge> - Assignment,
 								Homework&nbsp; &nbsp; <br />
-								<Badge variant={"outline"}>quiz</Badge> - Quiz&nbsp; &nbsp;{" "}
+								<Badge variant={"default"}>quiz</Badge> - Quiz&nbsp; &nbsp;{" "}
 								<br />
-								<Badge variant={"outline"}>deadline</Badge> - Others&nbsp;
+								<Badge variant={"default"}>deadline</Badge> - Others&nbsp;
 								&nbsp; <br />
 								{/* <Badge variant={"outline"}>other</Badge> - Other */}
 							</div>
@@ -202,11 +216,20 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 									stiffness: 400,
 									duration: 0.2,
 								}}
-								whileHover={{ scale: 0.95 }}
+								whileHover={{ scale: 0.99 }}
 								key={deadline.id}
-								className=""
+								// className={cn(dayCountUntillToday(new Date(deadline.end_at), 1) && "shadow-2xl")}
 							>
-								<Card key={deadline.id} className="flex flex-col">
+								<Card
+									key={deadline.id}
+									className={cn(
+										"flex flex-col",
+										dayCountUntillToday(new Date(deadline.end_at), 7) &&
+											"  border-2 border-blue-500/50 ",
+										dayCountUntillToday(new Date(deadline.end_at), 1) &&
+											"  border-2 border-destructive/50",
+									)}
+								>
 									<CardHeader className="pb-2">
 										<div className="flex justify-between items-start gap-2">
 											<Badge variant={getBadgeVariant(deadline.event_type)}>
@@ -254,8 +277,22 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 												}}
 											/>
 										</div> */}
-												<div className="text-2xl ">
-													{dayCountUntillToday(new Date(deadline.end_at))}
+												<div className="text-2xl flex items-center justify-between">
+													{dayCountUntillToday(new Date(deadline.end_at))} 
+													{dayCountUntillToday(new Date(deadline.end_at), 1) ? (
+														<Badge className="flex items-center animate-pulse duration-1000 bg-destructive/50 hover:bg-destructive/20  border-destructive/50 text-destructive-foreground">
+															<AlertOctagon size={20}  className="mr-2 my-0.5"/> {'<'}1 day left{" "}
+														</Badge>
+													) : (
+														dayCountUntillToday(
+															new Date(deadline.end_at),
+															7,
+														) && (
+															<Badge className="flex items-center  bg-blue-500/50 hover:bg-blue-500/20  border-blue-500/50 text-blue-500">
+															<Flag size={20} className="mr-2 my-0.5" /> {'<'}7 day left{" "}
+															</Badge>
+														)
+													)}
 												</div>
 											</div>
 										</div>
@@ -284,13 +321,13 @@ function getBadgeVariant(
 ): "default" | "secondary" | "destructive" | "outline" {
 	switch (type?.toLowerCase()) {
 		case "exam":
-			return "outline";
+			return "default";
 		case "assignment":
-			return "outline";
+			return "default";
 		case "quiz":
-			return "outline";
+			return "default";
 		default:
-			return "outline";
+			return "default";
 	}
 }
 
