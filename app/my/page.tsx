@@ -52,8 +52,11 @@ export default async function DashboardPage() {
 	return (
 		<div className="">
 			<Schedule group={user.user_metadata?.group} initialData={scheduleData} />
-      {deadlines.length > 0 ? <Deadlines deadlines={deadlines} /> : <p>No deadlines available.</p>}
-			
+			{deadlines.length > 0 ? (
+				<Deadlines deadlines={deadlines} />
+			) : (
+				<p>No deadlines available.</p>
+			)}
 		</div>
 	);
 }

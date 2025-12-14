@@ -38,6 +38,7 @@ import { Badge } from "./ui/badge";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { Tooltip, TooltipContent } from "./ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { WeekClasses } from "./week-classes";
 
 const DAYS_ORDER = [
 	"Monday",
@@ -209,7 +210,7 @@ export const Schedule: FC<ScheduleProps> = ({
 		<div className={cn("space-y-8 m-6 lg:m-10 ", className)}>
 			<h1 className="text-2xl font-bold">Schedule</h1>
 			<Tabs defaultValue="today">
-				<TabsList className="w-full flex items-center justify-between">
+				<TabsList className="w-full flex items-center justify-between pr-2">
 					<div className=" flex items-center justify-start">
 						<TabsTrigger className="lg:text-lg" value="today">
 							Today <span className="lg:block hidden">- {todayName}</span>
@@ -228,41 +229,52 @@ export const Schedule: FC<ScheduleProps> = ({
 							</Badge>
 						</TabsTrigger>
 					</div>
-						<Tooltip>
-							<TooltipTrigger asChild className="cursor-help hidden md:block">
-								<Badge variant={"outline"}>?</Badge>
-							</TooltipTrigger>
-							<TooltipContent
-								side="left"
-								className="bg-black/70 border p-2 cursor-help"
-							>
-								<div>
-									<span
-										className={cn(
-											"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
-											// session.type === "lecture"
-											"bg-blue-500 text-white",
-											// : "bg-emerald-500 text-white",
-										)}
-									>
-										online
-									</span>{" "}
-									 - Online class <br />
-									<span
-										className={cn(
-											"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
-											// session.type === "lecture"
-											// "bg-blue-500 text-white",
-											"bg-emerald-500 text-white",
-										)}
-									>
-										University
-									</span>{" "}
-									 - Ofline class <br />
-									{/* <Badge variant={"outline"}>other</Badge> - Other */}
-								</div>
-							</TooltipContent>
-						</Tooltip>
+					<Tooltip>
+						<TooltipTrigger asChild className="cursor-help hidden md:block">
+							<Badge variant={"outline"}>?</Badge>
+						</TooltipTrigger>
+						<TooltipContent
+							side="left"
+							className="bg-popover-foreground/70 border p-2 cursor-help text-popover"
+						>
+							<div>
+								<span
+									className={cn(
+										"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
+										// session.type === "lecture"
+										"bg-secondary text-secondary-foreground",
+										// : "bg-emerald-500 text-white",
+									)}
+								>
+									online
+								</span>{" "}
+								- Online class <br />
+								<span
+									className={cn(
+										"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
+										// session.type === "lecture"
+										// "bg-blue-500 text-white",
+										"bg-primary text-primary-foreground",
+									)}
+								>
+									University
+								</span>{" "}
+								- Ofline class <br />
+								<span
+									className={cn(
+										"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
+										// session.type === "lecture"
+										// "bg-blue-500 text-white",
+										"bg-muted/80 text-muted-foreground",
+									)}
+								>
+									Passed
+								</span>{" "}
+								- Past class <br />
+								{/* <Badge variant={"outline"}>other</Badge> - Other */}
+							</div>
+						</TooltipContent>
+					</Tooltip>
 				</TabsList>
 				<TabsContents>
 					<TabsContent value="today" className="p-4">
@@ -332,7 +344,7 @@ export const Schedule: FC<ScheduleProps> = ({
 
 													{/* Lecturer */}
 													<div className="flex items-start gap-2">
-														<User className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+														<User className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
 														<span className="text-xs text-muted-foreground leading-relaxed">
 															{session.lecturer.length > 2
 																? `${session.lecturer
@@ -436,7 +448,7 @@ export const Schedule: FC<ScheduleProps> = ({
 
 												{/* Lecturer */}
 												<div className="flex items-start gap-2">
-													<User className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+													<User className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
 													<span className="text-xs text-muted-foreground leading-relaxed">
 														{session.lecturer.length > 2
 															? `${session.lecturer.slice(0, 2).join(", ")} +${
@@ -446,11 +458,11 @@ export const Schedule: FC<ScheduleProps> = ({
 													</span>
 													<span
 														className={cn(
-																"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
-																session.classroom === "online"
-																	? "bg-blue-500 text-white"
-																	: "bg-emerald-500 text-white",
-															)}
+															"ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
+															session.classroom === "online"
+																? "bg-blue-500 text-white"
+																: "bg-emerald-500 text-white",
+														)}
 													>
 														{session.type}
 													</span>
@@ -478,15 +490,16 @@ export const Schedule: FC<ScheduleProps> = ({
 									</span>
 								)}
 							</p>
-							<ScrollArea className="rounded-[8px]">
-								<div className="min-w-[68rem] pt-4 pl-4">
+							<ScrollArea className="rounded-lg">
+								{/* <div className="min-w-272 pt-4 pl-4">
 									<TimeSteps showALL />
 									<Progress
 										value={0}
 										weekSessions={allWeekSessions}
 										className="w-full min-w-96  bg-white "
 									/>
-								</div>
+								</div> */}
+								<WeekClasses allWeekSessions={allWeekSessions} />
 								<ScrollBar orientation="horizontal" />
 							</ScrollArea>
 						</div>

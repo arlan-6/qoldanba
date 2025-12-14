@@ -100,7 +100,7 @@ function Progress({
       {/* <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
         className={cn(
-          "bg-blue-500/100 h-4 w-[3.47%] flex-1 transition-all hover:scale-150"
+          "bg-blue-500 h-4 w-[3.47%] flex-1 transition-all hover:scale-150"
         )}
         style={{
           transform: `translateX(-${
@@ -135,85 +135,96 @@ function Progress({
         if(session.classroom==="Online"){
           status="online"
         }
-
+        // status='upcoming'
         return (
           <HoverCard key={index} openDelay={50} closeDelay={50}>
-            <HoverCardTrigger onClick={(e) => e.stopPropagation()} asChild>
-              <ProgressPrimitive.Indicator
-                data-slot="progress-indicator"
-                className={cn(
-                  "absolute my-0.5 h-3 w-20 transition-all duration-200 cursor-pointer rounded-sm",
-                  "hover:scale-110 hover:shadow-lg hover:z-20",
-                  "w-[5.8%]",
+  <HoverCardTrigger onClick={(e) => e.stopPropagation()} asChild>
+    <ProgressPrimitive.Indicator
+      data-slot="progress-indicator"
+      className={cn(
+        // Base styling for the time slot indicator
+        "absolute my-0.5 h-3 w-20 transition-all duration-200 cursor-pointer rounded-sm",
+        "hover:scale-110 hover:shadow-lg hover:z-20",
+        "w-[5.8%]", // Assuming width calculation is correct
 
-                  // Passed sessions: Gray and transparent
-                  status === "passed" &&
-                    "bg-slate-300 dark:bg-slate-700 opacity-40 grayscale hover:grayscale-0 hover:opacity-100",
+        // Passed sessions: Muted, low-opacity look
+        status === "passed" &&
+          "bg-muted-foreground/80   hover:grayscale-0 hover:opacity-100", // Using muted-foreground for contrast
 
-                  // Current session: Pulsing ring and bright
-                  status === "current" &&
-                    "ring-2 ring-offset-1 ring-lime-500 z-10 animate-pulse",
-                  status==="online"&&
-                  "bg-purple-500 hover:bg-purple-400",
-                  // Upcoming (default) or Current: Type-based colors
-                  status !== "passed" &&
-                    (session.classroom === "online"
-                      ? "bg-blue-500 hover:bg-blue-400 "
-                      : "bg-emerald-500 hover:bg-emerald-400")
-                )}
-                style={{
-                  left: `calc(${startPercent}% - 0px)`,
-                }}
-              />
-            </HoverCardTrigger>
-            <HoverCardContent className="max-w-sm bg-gradient-to-br from-slate-900 to-slate-800 text-white border-2 border-slate-600 shadow-2xl p-4">
-              <div className="space-y-2.5">
-                {/* Discipline - Main heading */}
-                <div className="border-b border-slate-600 pb-2">
-                  <h3 className="font-bold text-base leading-tight flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-blue-400" />
-                    {session.discipline}
-                  </h3>
-                </div>
+        // Current session: Pulsing ring using the theme's primary accent
+        status === "current" &&
+          "ring-2 ring-offset-1 ring-primary z-10 animate-pulse",
 
-                {/* Time and Type row */}
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="text-sm font-medium">{session.time}</span>
-                  </div>
-                  <span
-                    className={cn(
-                      "px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide",
-                      session.type === "lecture"
-                        ? "bg-blue-500/20 text-blue-300 border border-blue-400/30"
-                        : "bg-emerald-500/20 text-emerald-300 border border-emerald-400/30"
-                    )}
-                  >
-                    {session.type}
-                  </span>
-                </div>
+        // Session type-based coloring (used for upcoming/online/current)
+        status !== "passed" &&
+          (session.classroom === "online"
+            ? "bg-secondary hover:bg-secondary/80" // Use secondary for online/remote
+            : session.type === "lecture"
+            ? "bg-primary hover:bg-primary/80" // Use primary for lectures (important)
+            : "bg-primary/70 hover:bg-primary/50" // A slightly softer primary for other types
+          )
+      )}
+      style={{
+        left: `calc(${startPercent}% - 0px)`,
+      }}
+    />
+  </HoverCardTrigger>
+  {/* [Theme Change: HoverCard Content] Apply dark, glossy look using theme colors */}
+  <HoverCardContent 
+    className="max-w-sm p-4 text-white backdrop-blur-md border border-primary/40 shadow-md shadow-primary/20"
+    // Using bg-card and text-foreground directly. If text-white is needed 
+    // for high contrast against bg-card in dark mode, keep it, but 
+    // using bg-card/70 for that glass look is better:
+    style={{ backgroundColor: 'oklch(0.18 0.005 53.043 / 0.7)' }} 
+  >
+    <div className="space-y-2.5">
+      {/* Discipline - Main heading */}
+      <div className="border-b border-primary/40 pb-2"> {/* Used primary for separator */}
+        <h3 className="font-bold text-base leading-tight flex items-center gap-2 text-primary"> {/* Used primary for icon and text */}
+          <BookOpen className="w-4 h-4" />
+          {session.discipline}
+        </h3>
+      </div>
 
-                {/* Classroom */}
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="text-sm">{session.classroom}</span>
-                </div>
+      {/* Time and Type row */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5 text-muted-foreground" /> {/* Used muted for subtle icons */}
+          <span className="text-sm font-medium text-foreground">{session.time}</span>
+        </div>
+        <span
+          className={cn(
+            "px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide",
+            // Type-specific colors using theme variables
+            // session.type === "lecture"
+               "bg-primary/20 text-primary border border-primary/40" // Primary for Lectures
+              // : "bg-secondary/20 text-secondary border border-secondary/40" // Secondary for Labs/Seminars
+          )}
+        >
+          {session.type}
+        </span>
+      </div>
 
-                {/* Lecturer */}
-                <div className="flex items-start gap-1.5 pt-1 border-t border-slate-700/50">
-                  <User className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-xs text-slate-300 leading-relaxed">
-                    {session.lecturer.length > 2
-                      ? `${session.lecturer.slice(0, 2).join(", ")} +${
-                          session.lecturer.length - 2
-                        } more`
-                      : session.lecturer.join(", ")}
-                  </span>
-                </div>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
+      {/* Classroom */}
+      <div className="flex items-center gap-1.5">
+        <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+        <span className="text-sm text-foreground">{session.classroom}</span>
+      </div>
+
+      {/* Lecturer */}
+      <div className="flex items-start gap-1.5 pt-1 border-t border-muted/50"> {/* Used muted for subtle separator */}
+        <User className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+        <span className="text-xs text-muted-foreground leading-relaxed"> {/* Used muted for secondary info text */}
+          {session.lecturer.length > 2
+            ? `${session.lecturer.slice(0, 2).join(", ")} +${
+                session.lecturer.length - 2
+              } more`
+            : session.lecturer.join(", ")}
+        </span>
+      </div>
+    </div>
+  </HoverCardContent>
+</HoverCard>
         );
       })}
 
