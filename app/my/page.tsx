@@ -48,9 +48,15 @@ export default async function DashboardPage() {
   const shouldSync = !lastSync || Date.now() - lastSync.getTime() > 3600 * 1000;
 
   if (user.user_metadata?.icsLink && shouldSync) {
+    console.log("deadlines syns");
+
     // Sync logic handled by server action
-    await syncDeadlines(user.user_metadata.icsLink);
-    deadlines = await getDeadlines();
+    const syncResult = await syncDeadlines(user.user_metadata.icsLink, false);
+    if (!syncResult.error && syncResult.deadlines) {
+      deadlines = syncResult.deadlines;
+    } else {
+      deadlines = await getDeadlines();
+    }
   }
 
   // console.log(deadlines);

@@ -80,6 +80,10 @@ export async function POST(req: Request) {
 
         raw_vevent: ev.__raw,
       };
+    })
+    .filter((row) => {
+      if (!row.end_at) return true;
+      return new Date(row.end_at) > new Date();
     });
 
   // 6) Upsert into deadlines
@@ -92,6 +96,18 @@ export async function POST(req: Request) {
   if (error) {
     console.error(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Cleanup past deadlines
+  const { error: deleteError } = await supabase
+    .from('deadlines')
+    .delete()
+    .lt('end_at', new Date().toISOString())
+    .eq('user_id', user.id);
+
+  if (deleteError) {
+    console.error('Cleanup error:', deleteError);
+    // Don't fail the request, just log it
   }
 
   return NextResponse.json({

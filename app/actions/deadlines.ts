@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { parseIcsEvents, detectEventType, parseIcsDate } from '@/lib/ics';
 
-export async function syncDeadlines(icsUrl: string) {
+export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -45,6 +45,10 @@ export async function syncDeadlines(icsUrl: string) {
         ics_dtstamp: ev.DTSTAMP ? parseIcsDate(ev.DTSTAMP) : null,
         raw_vevent: ev.__raw,
       };
+    })
+    .filter((row) => {
+      if (!row.end_at) return true; // Keep if no end date
+      return new Date(row.end_at) > new Date(); // Keep only future deadlines
     });
 
     const { error } = await supabase
@@ -53,8 +57,27 @@ export async function syncDeadlines(icsUrl: string) {
 
     if (error) throw error;
 
-    // revalidatePath('/my');
-    return { count: rows.length };
+    // Cleanup: Delete deadlines that are already in the past
+    // We do this after upsert to ensure even if the ICS had them, they get removed if they are now past.
+    // (Though the filter above prevents new ones, this cleans old ones).
+    await supabase
+      .from('deadlines')
+      .delete()
+      .lt('end_at', new Date().toISOString())
+      .eq('user_id', user.id); // Safety check for user
+
+    if (revalidate) {
+      revalidatePath('/my');
+    }
+    
+    // Fetch fresh deadlines to return to the UI (bypassing request memoization via unique query)
+    const { data: freshDeadlines } = await supabase
+      .from('deadlines')
+      .select('*')
+      .gte('end_at', new Date().toISOString()) // Also acts as a cache buster due to varying timestamp
+      .order('end_at', { ascending: true });
+
+    return { count: rows.length, deadlines: freshDeadlines || [] };
   } catch (error: any) {
     console.error('Sync error:', error);
     return { error: error.message };
