@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { motion } from "motion/react";
 import { CopyrightYear } from "./copyright-year";
+import Image from "next/image";
+import scheduleScreenshot from "../public/scheduleScreenshot.png";
 
 // --- Animation Variants (Adjusted for smoother, subtle appearance) ---
 const containerVariants = {
@@ -103,11 +105,11 @@ export default function LandingPage() {
 							className="flex flex-wrap gap-4 pt-4"
 							variants={itemVariants}
 						>
-							<Link href="/dashboard">
+							<Link href="/my">
 								<Button
 									size="lg"
 									// [Change 3: Primary Button] Electric, glowing button style
-									className="gap-2 h-14 px-10 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-primary cursor-pointer hover:shadow-[0_0_30px_rgba(37,99,235,1)] transition-all duration-300"
+									// className="gap-2 h-14 px-10 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-primary cursor-pointer hover:shadow-[0_0_30px_rgba(37,99,235,1)] transition-all duration-300"
 								>
 									Dashboard <ArrowRight className="h-5 w-5 ml-1" />
 								</Button>
@@ -125,8 +127,8 @@ export default function LandingPage() {
 						{/* [Change 5: Glassmorphism] Card with border gradient and backdrop blur */}
 						<BorderGradientCard className="shadow-2xl shadow-primary/30">
 							<div className="p-2 rounded-[11px] bg-black/50 backdrop-blur-xl border border-white/10">
-								<img
-									src="https://placehold.co/1200x600/493C19/ffffff?text=Dynamic+Schedule+and+Deadlines"
+								<Image
+									src={scheduleScreenshot}
 									alt="Qoldanba Dashboard"
 									className="rounded-lg w-full h-auto object-cover border border-white/10"
 									width={1200}
@@ -142,7 +144,7 @@ export default function LandingPage() {
 			</section>
 
 			{/* --- FEATURES SECTION (Clean Grid) --- */}
-			<section id="features" className="py-28 w-full">
+			{/* <section id="features" className="py-28 w-full">
 				<div className="container px-4 md:px-6">
 					<div className="text-center mb-16 max-w-3xl mx-auto">
 						<span className="inline-block px-3 py-1 text-sm font-medium rounded-full border border-primary/40 text-primary mb-3 uppercase tracking-wider">
@@ -182,7 +184,6 @@ export default function LandingPage() {
 							},
 						].map((feature, idx) => (
 							<motion.div key={idx} variants={itemVariants} className="h-full">
-								{/* [Change 5: Feature Card Style] Glassy, subtle hover effect */}
 								<BorderGradientCard className="h-full transition-all duration-300 hover:shadow-primary/50 hover:shadow-xl">
 									<Card className="h-full bg-black/50 backdrop-blur-md border border-white/10 text-white">
 										<CardHeader>
@@ -202,16 +203,16 @@ export default function LandingPage() {
 						))}
 					</motion.div>
 				</div>
-			</section>
+			</section> */}
 
 			{/* --- FOOTER --- */}
 			<footer className="py-12 w-full border-t border-primary/20 bg-black/40">
 				<div className="container text-center text-gray-500 text-sm">
 					<p>
-						&copy; <CopyrightYear /> Qoldanba. All rights reserved.{" "}
-						<Link href="#" className="hover:text-primary transition-colors">
+						&copy; <CopyrightYear /> Qoldanba.
+						{/* <Link href="#" className="hover:text-primary transition-colors">
 							Privacy Policy
-						</Link>
+						</Link> */}
 					</p>
 				</div>
 			</footer>
