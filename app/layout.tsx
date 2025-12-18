@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -10,10 +10,35 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Qoldanba",
-  description: "Check your deadlines and schedule",
+  title: {
+    default: "Qoldanba",
+    template: "%s | Qoldanba",
+  },
+  description:
+    "Check your deadlines and schedule. Centralize your university life with Qoldanba.",
+  keywords: [
+    "university",
+    "schedule",
+    "deadlines",
+    "academic autopilot",
+    "LMS sync",
+  ],
+  authors: [{ name: "arlan-6" }],
+  creator: "arlan-6",
+  publisher: "Arlan",
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Qoldanba",
+    description: "Check your deadlines and schedule.",
+    creator: "@arlan-6",
   },
 };
 

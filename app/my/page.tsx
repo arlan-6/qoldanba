@@ -3,6 +3,16 @@ import { Schedule } from "@/components/schedule";
 import { getDeadlines, syncDeadlines } from "@/app/actions/deadlines";
 import { redirect } from "next/navigation";
 import Deadlines from "@/components/dedlines";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "My Dashboard",
+  description: "View your schedule and deadlines.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 // export const dynamic = "force-dynamic";
 

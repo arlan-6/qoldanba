@@ -1,4 +1,11 @@
 import { SignUpForm } from "@/components/sign-up-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sign Up",
+  description:
+    "Create your Qoldanba account to start tracking your academic life.",
+};
 
 export default function Page() {
   return (

@@ -1,4 +1,10 @@
 import { LoginForm } from "@/components/login-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Login",
+  description: "Sign in to your Qoldanba account.",
+};
 
 export default function Page() {
   return (
