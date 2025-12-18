@@ -74,6 +74,7 @@ export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) 
     const { data: freshDeadlines } = await supabase
       .from('deadlines')
       .select('*')
+      .eq('user_id', user.id)
       .gte('end_at', new Date().toISOString()) // Also acts as a cache buster due to varying timestamp
       .order('end_at', { ascending: true });
 
@@ -87,10 +88,16 @@ export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) 
 
 export async function getDeadlines() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
 
   const { data: deadlines, error } = await supabase
     .from('deadlines')
     .select('*')
+    .eq('user_id', user.id)
     .order('end_at', { ascending: true });
 
   if (error) {
@@ -103,11 +110,17 @@ export async function getDeadlines() {
 
 export async function updateDeadline(id: string, updates: any) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Unauthorized');
 
   const { error } = await supabase
     .from('deadlines')
     .update(updates)
-    .eq('id', id);
+    .eq('id', id)
+    .eq('user_id', user.id);
 
   if (error) {
     console.error('Error updating deadline:', error);
