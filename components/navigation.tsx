@@ -52,12 +52,12 @@ export default async function Navigation() {
 						>
 							Home
 						</Link>
-						<Link
+						{/* <Link
 							href="#features"
 							className="transition-colors hover:text-primary hover:font-normal"
 						>
 							Features
-						</Link>
+						</Link> */}
 						{user && (
 							<Link
 								href="/my"

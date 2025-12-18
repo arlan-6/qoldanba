@@ -14,6 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { toast } from "sonner";
+import { Badge } from "./ui/badge";
+import Link from "next/link";
+
 
 export function OnboardingForm({
     className,
@@ -39,7 +44,7 @@ export function OnboardingForm({
                 },
             });
             if (error) throw error;
-            router.push("/dashboard");
+            router.push("/my");
         } catch (error: unknown) {
             setError(error instanceof Error ? error.message : "An error occurred");
         } finally {
@@ -70,14 +75,60 @@ export function OnboardingForm({
                                 />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="ics-link">ICS Link</Label>
-                                <Input
-                                    id="ics-link"
-                                    type="text"
-                                    required
-                                    value={icsLink}
-                                    onChange={(e) => setIcsLink(e.target.value)}
-                                />
+                                <Label htmlFor="ics-link">
+                  ICS Link
+                  <Tooltip>
+                    <TooltipTrigger
+                      onClick={() => {
+                        toast("Export calendar from LMS", {
+                          action: {
+                            label: "LMS link",
+                            onClick: () => {
+                              window.open(
+                                "https://lms.astanait.edu.kz/calendar/export.php?",
+                                "_blank"
+                              );
+                            },
+                          },
+                          duration: 10000,
+                          description:
+                            'Choose "all events", "click custom range"',
+                        });
+                      }}
+                      className="ml-2 text-muted-foreground hover:text-foreground"
+                    >
+                      {" "}
+                      <Badge variant={"outline"}>?</Badge>
+                    </TooltipTrigger>
+                    <TooltipContent className="border p-2 px-3 bg-background text-sm">
+                      <p>ICS Link should be from LMS calendar</p>
+                      <li className="list-disc">
+                        <ul>1. Open link below</ul>
+                        <ul>2. Click all events</ul>
+                        <ul>3. Click Custom range</ul>
+                        <ul>4. Click Get calendar URL</ul>
+                      </li>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <Input
+                  id="ics-link"
+                  type="text"
+                  required
+                  value={icsLink}
+                  onChange={(e) => setIcsLink(e.target.value)}
+                  placeholder="https://lms.astanait.edu.kz/calendar/export_execute.php?"
+                />
+                <div className="text-xs text-muted-foreground">
+                  <p>ICS Link should be from LMS calendar</p>
+                  <Link
+                    className="underline"
+                    target="_blank"
+                    href="https://lms.astanait.edu.kz/calendar/export.php?"
+                  >
+                    https://lms.astanait.edu.kz/calendar/export.php?
+                  </Link>
+                </div>
                             </div>
                             {error && <p className="text-sm text-red-500">{error}</p>}
                             <Button type="submit" className="w-full" disabled={isLoading}>
