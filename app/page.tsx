@@ -5,18 +5,18 @@ import { Metadata } from "next";
 
 // Define SEO Metadata here
 export const metadata: Metadata = {
-  title: "Intelligent Academic Autopilot",
+  title: "Qoldanba",
   description:
     "Centralize your university life. Auto-sync deadlines from LMS and view your class schedule in one dashboard.",
   openGraph: {
-    title: "Qoldanba - Intelligent Academic Autopilot",
-    description: "The intelligent academic autopilot for modern students.",
+    title: "Qoldanba",
+    description: "Dashboard for university students",
     type: "website",
     url: "/",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Qoldanba - Intelligent Academic Autopilot",
+    title: "Qoldanba",
     description:
       "Centralize your university life. Auto-sync deadlines from LMS.",
   },

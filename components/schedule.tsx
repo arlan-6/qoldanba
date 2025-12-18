@@ -209,17 +209,17 @@ export const Schedule: FC<ScheduleProps> = ({
 
   return (
     <div className={cn("space-y-8 m-6 lg:m-10 ", className)}>
-      <h1 className="text-2xl font-bold">Schedule</h1>
+      <h1 className="text-xl font-bold">Schedule</h1>
       <Tabs defaultValue="today">
         <TabsList className="w-full flex items-center justify-between pr-2">
           <div className=" flex items-center justify-start">
-            <TabsTrigger className="lg:text-lg" value="today">
+            <TabsTrigger className="" value="today">
               Today <span className="lg:block hidden">- {todayName}</span>
             </TabsTrigger>
-            <TabsTrigger className="lg:text-lg" value="tomorrow">
+            <TabsTrigger className="" value="tomorrow">
               Tomorrow <span className="lg:block hidden">- {tomorrowName}</span>
             </TabsTrigger>
-            <TabsTrigger className="lg:text-lg" value="allWeek">
+            <TabsTrigger className="" value="allWeek">
               All Week{" "}
             </TabsTrigger>
           </div>

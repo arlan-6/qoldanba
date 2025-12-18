@@ -1,5 +1,6 @@
+import { SidebarProvider } from "@/components/animate-ui/components/radix/sidebar";
 import Navigation from "@/components/navigation";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { AppSidebar } from "@/components/app-sidebar";
 import { Suspense } from "react";
 
 export default function ProtectedLayout({
@@ -17,11 +18,12 @@ export default function ProtectedLayout({
         >
           <Navigation />
         </Suspense>
-        <div className="">
-          {children}
+        <div className="flex">
+          <SidebarProvider defaultOpen={false}>
+            <AppSidebar />
+            <div className="flex-1 overflow-auto">{children}</div>
+          </SidebarProvider>
         </div>
-
-       
       </div>
     </main>
   );
