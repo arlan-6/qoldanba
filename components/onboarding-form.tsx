@@ -72,6 +72,7 @@ export function OnboardingForm({
                                     required
                                     value={group}
                                     onChange={(e) => setGroup(e.target.value)}
+                                    placeholder="BDA-2506"
                                 />
                             </div>
                             <div className="grid gap-2">

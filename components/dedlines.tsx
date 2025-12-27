@@ -107,7 +107,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 							</button>
 						</div>
 						<motion.div
-							whileHover={{ y: -10 }}
+							whileHover={{ y: -4 }}
 							whileTap={{ scale: 0.9 }}
 							transition={{
 								// delay: 0.5 * i,
@@ -122,7 +122,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 								variant={!showDeadlines ? "default" : "outline"}
 								className={cn(
 									!showExams && "line-through",
-									"text-md mx-1 md:m-2",
+									"text-md mx-1 md:m-2 cursor-pointer",
 								)}
 								aria-label="exam"
 								value="exam"
@@ -131,7 +131,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 							</ToggleGroupItem>
 						</motion.div>
 						<motion.div
-							whileHover={{ y: -10 }}
+							whileHover={{ y: -4 }}
 							whileTap={{ scale: 0.9 }}
 							transition={{
 								// delay: 0.5 * i,
@@ -146,7 +146,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 								variant={!showDeadlines ? "default" : "outline"}
 								className={cn(
 									!showAssignments && "line-through",
-									"text-md mx-1 md:m-2",
+									"text-md mx-1 md:m-2 cursor-pointer",
 								)}
 								aria-label="assignment"
 								value="assignment"
@@ -155,7 +155,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 							</ToggleGroupItem>
 						</motion.div>
 						<motion.div
-							whileHover={{ y: -10 }}
+							whileHover={{ y: -4 }}
 							whileTap={{ scale: 0.9 }}
 							transition={{
 								// delay: 0.5 * i,
@@ -170,7 +170,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 								variant={!showDeadlines ? "default" : "outline"}
 								className={cn(
 									!showQuizzes && "line-through",
-									"text-md mx-1 md:m-2",
+									"text-md mx-1 md:m-2 cursor-pointer",
 								)}
 								aria-label="quiz"
 								value="quiz"
@@ -179,7 +179,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 							</ToggleGroupItem>
 						</motion.div>
 						<motion.div
-							whileHover={{ y: -10 }}
+							whileHover={{ y: -4 }}
 							whileTap={{ scale: 0.9 }}
 							transition={{
 								// delay: 0.5 * i,
@@ -194,7 +194,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
 								variant={!showDeadlines ? "default" : "outline"}
 								className={cn(
 									!showDeadlines && "line-through",
-									"text-md mx-1 md:m-2",
+									"text-md mx-1 md:m-2 cursor-pointer",
 								)}
 								aria-label="deadline"
 								value="deadline"

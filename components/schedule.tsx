@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Progress } from "./ui/progress";
 import TimeSteps from "./time-steps";
-import { Clock, MapPin, User } from "lucide-react";
 import {
   Tabs,
   TabsContent,
@@ -172,7 +171,9 @@ export const Schedule: FC<ScheduleProps> = ({
   const tomorrowName = tomorrow ? getDayName(tomorrow) : "";
   const weekNumber = today ? getWeekNumber(today) : "";
 
-  const todaySessions = weekSchedule?.[todayName] || [];
+  const todaySessions = (weekSchedule?.[todayName] || []).filter(
+    (sessions) => sessions.classroom !== "online"
+  );
   const tomorrowSessions = weekSchedule?.[tomorrowName] || [];
   const allWeekSessions = weekSchedule
     ? DAYS_ORDER.map((day) => weekSchedule[day]).filter(
@@ -282,7 +283,7 @@ export const Schedule: FC<ScheduleProps> = ({
               <div className="flex gap-16 mb-6 items-center">
                 <p className="  ">
                   {todaySessions.length === 0 ? (
-                    <span className="text-muted-foreground">No classes</span>
+                    <span className="text-muted-foreground">No classes :D</span>
                   ) : (
                     <span className="text-muted-foreground">
                       {todaySessions.length} classes
@@ -318,7 +319,7 @@ export const Schedule: FC<ScheduleProps> = ({
               </h2>
               <p className="mb-6">
                 {tomorrowSessions.length === 0 ? (
-                  <span className="text-muted-foreground">No classes</span>
+                  <span className="text-muted-foreground">No classes :D</span>
                 ) : (
                   <span className="text-muted-foreground">
                     {tomorrowSessions.length} classes

@@ -96,18 +96,7 @@ function Progress({
       )}
       {...props}
     >
-      {/* Current time dot indicator */}
-      {/* <ProgressPrimitive.Indicator
-        data-slot="progress-indicator"
-        className={cn(
-          "bg-blue-500 h-4 w-[3.47%] flex-1 transition-all hover:scale-150"
-        )}
-        style={{
-          transform: `translateX(-${
-            100 - proportionalValue
-          }%) translateY(-100%)`,
-        }}
-      /> */}
+
 
       {sessions?.map((session, index) => {
         // Extract times
