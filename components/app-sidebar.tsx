@@ -22,10 +22,16 @@ import {
   Group,
   Users,
   MailQuestion,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { LogoutButton } from "./logout-button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
 
 export async function AppSidebar({
   ...props
@@ -43,8 +49,14 @@ export async function AppSidebar({
   const currentUrl = headersList.get("x-pathname");
   // console.log(currentUrl);
   return (
-    <Sidebar side="left" variant="sidebar" collapsible="icon" {...props}>
-      <SidebarContent className="pt-16">
+    <Sidebar
+      className="pt-18"
+      side="left"
+      variant="floating"
+      collapsible="icon"
+      {...props}
+    >
+      <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -79,7 +91,7 @@ export async function AppSidebar({
                 </SidebarMenuButton>
               </SidebarMenuItem> */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Dashboard" >
+                <SidebarMenuButton asChild tooltip="Dashboard">
                   <Link href="/my">
                     <LayoutDashboard />
                     <span>Dashboard</span>
@@ -97,19 +109,18 @@ export async function AppSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarFooter>
-          <SidebarMenuItem>
-            <SidebarGroupLabel>Questions?</SidebarGroupLabel>
 
+        <div className="mt-auto p-2">
+          <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Questions?">
               <Link href="https://t.me/ArLaN_XD" target="_blank">
-              <MailQuestion/>
+                <MailQuestion />
                 <span>Contact Telegram</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarFooter>
-        <div className="mt-auto p-2">
+
+          <SidebarSeparator className="my-2 mx-0" />
           <SidebarTrigger size={"lg"} />
         </div>
       </SidebarContent>

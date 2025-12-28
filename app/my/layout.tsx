@@ -21,7 +21,9 @@ export default function ProtectedLayout({
         <div className="flex">
           <SidebarProvider defaultOpen={false}>
             <AppSidebar />
-            <div className="flex-1 overflow-auto">{children}</div>
+            <div className="flex-1 overflow-auto bg-background/80  ">
+              {children}
+            </div>
           </SidebarProvider>
         </div>
       </div>
