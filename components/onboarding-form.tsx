@@ -73,6 +73,8 @@ export function OnboardingForm({
                                     value={group}
                                     onChange={(e) => setGroup(e.target.value)}
                                     placeholder="BDA-2506"
+                                    pattern="[A-Z]{2,5}-\d{4}"
+                                    title="Group should be in format BDA-2506"
                                 />
                             </div>
                             <div className="grid gap-2">
