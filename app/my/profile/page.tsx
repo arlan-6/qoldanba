@@ -41,8 +41,7 @@ const ProfilePage = () => {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user);
-      setLoading(false);
-      console.log(user);
+      setLoading(false); 
     };
     fetchUser();
   }, [supabase]);

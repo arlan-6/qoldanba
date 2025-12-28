@@ -3,8 +3,10 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -12,8 +14,18 @@ import {
   SidebarTrigger,
 } from "@/components/animate-ui/components/radix/sidebar";
 import { createClient } from "@/lib/supabase/server";
-import { Home, Calendar, LayoutDashboard, User, Group, Users } from "lucide-react";
+import {
+  Home,
+  Calendar,
+  LayoutDashboard,
+  User,
+  Group,
+  Users,
+  MailQuestion,
+} from "lucide-react";
 import Link from "next/link";
+import { headers } from "next/headers";
+import { LogoutButton } from "./logout-button";
 
 export async function AppSidebar({
   ...props
@@ -23,8 +35,13 @@ export async function AppSidebar({
     data: { user },
   } = await supabase.auth.getUser();
   const metadata = user?.user_metadata || {};
-  const fullName = metadata.full_name || metadata.name || metadata.user_name || "User";
+  const fullName =
+    metadata.full_name || metadata.name || metadata.user_name || "User";
   const group = metadata.group.toUpperCase() || "Not assigned";
+
+  const headersList = await headers();
+  const currentUrl = headersList.get("x-pathname");
+  // console.log(currentUrl);
   return (
     <Sidebar side="left" variant="sidebar" collapsible="icon" {...props}>
       <SidebarContent className="pt-16">
@@ -32,21 +49,26 @@ export async function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={fullName}>
-                  <Link href="/my/profile">  <User />
-                  <span>{fullName}</span></Link>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={fullName}
+                  isActive={currentUrl === "/my/profile"}
+                >
+                  <Link href="/my/profile">
+                    {" "}
+                    <User />
+                    <span>{fullName}</span>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton tooltip={group}>
-                 
                   <Users />
                   <span>{group}</span>
-                
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
-              <SidebarSeparator className="my-2 mx-0"/>
+            <SidebarSeparator className="my-2 mx-0" />
             <SidebarMenu>
               {/* <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Home">
@@ -57,7 +79,7 @@ export async function AppSidebar({
                 </SidebarMenuButton>
               </SidebarMenuItem> */}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Dashboard" isActive>
+                <SidebarMenuButton asChild tooltip="Dashboard" >
                   <Link href="/my">
                     <LayoutDashboard />
                     <span>Dashboard</span>
@@ -75,6 +97,18 @@ export async function AppSidebar({
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <SidebarFooter>
+          <SidebarMenuItem>
+            <SidebarGroupLabel>Questions?</SidebarGroupLabel>
+
+            <SidebarMenuButton asChild tooltip="Questions?">
+              <Link href="https://t.me/ArLaN_XD" target="_blank">
+              <MailQuestion/>
+                <span>Contact Telegram</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarFooter>
         <div className="mt-auto p-2">
           <SidebarTrigger size={"lg"} />
         </div>
