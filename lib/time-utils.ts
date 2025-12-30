@@ -46,6 +46,7 @@ export const dayCountUntillToday = (
 	const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 	const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 	const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+	const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 	if (lessThat) {
 		if (lessThat === 1 && days === 0) {
 			return true;
@@ -58,7 +59,8 @@ export const dayCountUntillToday = (
 	const parts = [];
 	if (days > 0) parts.push(`${days}d`);
 	if (hours > 0) parts.push(`${hours}h`);
-	parts.push(`${minutes}min`);
+	if (minutes > 0 || (days === 0 && hours === 0)) parts.push(`${minutes}min`);
+	if (days === 0 && hours < 3) parts.push(`${seconds}s`);
 
 	return parts.join(" ");
 };
