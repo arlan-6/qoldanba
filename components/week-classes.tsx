@@ -51,7 +51,7 @@ export const WeekClasses: FC<WeekClassesProps> = ({
     "Saturday",
   ];
 
-  console.log(allWeekSessions);
+  // console.log(allWeekSessions);
 
   return (
     <div className={cn("", className)}>

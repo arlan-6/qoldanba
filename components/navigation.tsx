@@ -6,6 +6,8 @@ import { EnvVarWarning } from "@/components/env-var-warning";
 import { hasEnvVars } from "@/lib/utils";
 import { Fugaz_One } from "next/font/google";
 import { Badge } from "./ui/badge";
+import { SidebarTrigger } from "./animate-ui/components/radix/sidebar";
+import SidebarTriggerNav from "./sidebar-trigger-nav";
 
 const fugaz_one = Fugaz_One({
 	weight: "400",
@@ -34,6 +36,8 @@ export default async function Navigation() {
 						>
 							Qoldanbα
 						</Link>
+						
+
 						{/* <Badge
 							title="work in progress"
 							// className="bg-destructive"
@@ -76,6 +80,7 @@ export default async function Navigation() {
                         Shadcn/ui primary button, it should become primary/outline). */}
 					{!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
 					<ThemeSwitcher />
+					<SidebarTriggerNav />
 				</div>
 			</div>
 		</nav>

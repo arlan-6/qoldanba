@@ -23,6 +23,7 @@ import {
   Users,
   MailQuestion,
   ChevronDown,
+  Link as LinkIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { headers } from "next/headers";
@@ -95,6 +96,14 @@ export async function AppSidebar({
                   <Link href="/my">
                     <LayoutDashboard />
                     <span>Dashboard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Links">
+                  <Link href="/my/links">
+                    <LinkIcon />
+                    <span>Links</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
