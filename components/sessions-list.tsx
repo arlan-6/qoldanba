@@ -21,15 +21,61 @@ const SessionsList = ({
   lastSessionEndTime,
   isTomorrow,
 }: SessionsListProps) => {
+  const toMinutes = (time: string) => {
+    const [hours, minutes] = time.split(":").map((part) => Number(part));
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
+    return hours * 60 + minutes;
+  };
+
+  const getRangeMinutes = (timeRange: string) => {
+    const [start, end] = timeRange.split("-");
+    if (!start || !end) return null;
+    const startMinutes = toMinutes(start.trim());
+    const endMinutes = toMinutes(end.trim());
+    if (startMinutes === null || endMinutes === null) return null;
+    return { startMinutes, endMinutes, start, end };
+  };
+
+  const lecturersMatch = (left: string[], right: string[]) => {
+    if (left.length !== right.length) return false;
+    return left.every((name, index) => name === right[index]);
+  };
+
+  const mergedSessions = sessions.reduce<Session[]>((acc, session) => {
+    const last = acc[acc.length - 1];
+    if (!last) return [...acc, session];
+
+    const lastRange = getRangeMinutes(last.time);
+    const nextRange = getRangeMinutes(session.time);
+    const sameDetails =
+      last.discipline === session.discipline &&
+      last.type === session.type &&
+      last.classroom === session.classroom &&
+      lecturersMatch(last.lecturer, session.lecturer);
+
+    if (lastRange && nextRange && sameDetails) {
+      const gapMinutes = nextRange.startMinutes - lastRange.endMinutes;
+      if (gapMinutes >= 0 && gapMinutes <= 10) {
+        const merged: Session = {
+          ...last,
+          time: `${lastRange.start}-${nextRange.end}`,
+        };
+        return [...acc.slice(0, -1), merged];
+      }
+    }
+
+    return [...acc, session];
+  }, []);
+
   return (
     <div>
-      {sessions.length > 0 && (
+      {mergedSessions.length > 0 && (
         <div className="mt-8">
           <h3 className="text-lg font-semibold mb-4">
             {isTomorrow ? "Tomorrow's Classes" : "Today's Classes"}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sessions.map((session, index) => {
+            {mergedSessions.map((session, index) => {
               if (session.classroom === "online") return;
 
               return (
@@ -88,7 +134,7 @@ const SessionsList = ({
         </div>
       )}
       {/* All passed message */}
-      {sessions.length > 0 && currentTimePercent > lastSessionEndTime && (
+      {mergedSessions.length > 0 && currentTimePercent > lastSessionEndTime && (
         <div className="m-6">
           <blockquote className="border-l-2 border-emerald-500 pl-6 italic text-muted-foreground">
             You passed all sessions
