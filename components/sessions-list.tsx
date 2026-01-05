@@ -70,8 +70,8 @@ const SessionsList = ({
   return (
     <div>
       {mergedSessions.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className="mt-4">
+          <h3 className="text-base font-semibold mb-2">
             {isTomorrow ? "Tomorrow's Classes" : "Today's Classes"}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -81,21 +81,23 @@ const SessionsList = ({
               return (
                 <div
                   key={index}
-                  className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-card"
+                  className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card"
                 >
-                  <div className="flex items-start gap-2 justify-between mb-4">
-                    {/* Discipline - Main heading */}
-                    <h4 className="font-bold text-lg leading-tight line-clamp-2">
-                      {session.discipline}
-                    </h4>
-                  </div>
+                  <div className="flex justify-between flex-wrap">
+                    <div className="flex items-start gap-2 justify-between mb-4">
+                      {/* Discipline - Main heading */}
+                      <h4 className="font-bold text-base leading-tight line-clamp-1">
+                        {session.discipline}
+                      </h4>
+                    </div>
 
-                  {/* Time and Type */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <Clock className="w-4 h-4 text-primary" />
-                    <span className="text-base font-bold text-primary line-clamp-1">
-                      {session.time}
-                    </span>
+                    {/* Time and Type */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span className="text-base font-bold text-primary ">
+                        {session.time}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Classroom */}
@@ -119,7 +121,7 @@ const SessionsList = ({
                     <span
                       className={cn(
                         "ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
-                        session.classroom === "online"
+                        session.type === "practice"
                           ? "bg-blue-500 text-white"
                           : "bg-emerald-500 text-white"
                       )}

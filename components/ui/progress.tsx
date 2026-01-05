@@ -83,7 +83,7 @@ function Progress({
     <ProgressPrimitive.Root
       data-slot="progress"
       className={cn(
-        "bg-primary relative h-4 overflow-hidden rounded-full w-full",
+        "bg-primary relative h-3 overflow-hidden rounded-full w-full",
         // Hardcoded widths for different devices
         // "w-[320px]", // Mobile (default)
         // "sm:w-[640px]", // Small tablets
@@ -132,7 +132,7 @@ function Progress({
       data-slot="progress-indicator"
       className={cn(
         // Base styling for the time slot indicator
-        "absolute my-0.5 h-3 w-20 transition-all duration-200 cursor-pointer rounded-sm",
+        "absolute my-0.5 h-2 w-20 transition-all duration-200 cursor-pointer rounded-sm",
         "hover:scale-110 hover:shadow-lg hover:z-20",
         "w-[5.8%]", // Assuming width calculation is correct
 

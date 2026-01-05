@@ -73,7 +73,7 @@ export const WeekClasses: FC<WeekClassesProps> = ({
         <TableBody>
           {timeSlots.map((slot, rowIdx) => (
             <TableRow key={rowIdx}>
-              <TableCell className="font-medium bg-accent text-xs md:text-sm sticky left-0 z-10">
+              <TableCell className="font-medium bg-accent text-xs md:text-xs sticky left-0 z-10">
                 {slot.split("\n")[0]}
               </TableCell>
               {allWeekSessions.map((sessionDay, dayIdx) => {
@@ -85,10 +85,10 @@ export const WeekClasses: FC<WeekClassesProps> = ({
                   >
                     {session ? (
                       <div>
-                        <div className="font-medium text-xs md:text-sm">
+                        <div className="font-medium text-xs md:text-xs  ">
                           {session.discipline}
                         </div>
-                        <div className="flex flex-col text-xs md:text-sm text-muted-foreground gap-1">
+                        <div className="flex flex-col text-xs md:text-xs text-muted-foreground gap-1">
                           <div>
                             {session.lecturer[0]}
                             {session.lecturer.length > 1 && ", ..."}

@@ -56,7 +56,7 @@ const TimeSteps: React.FC<TimeStepsProps> = ({ daySchedule,showALL }) => {
         <div key={index} className="flex flex-col items-center">
           <span
             className={cn(isOddHour ? " hidden sm:hidden md:block lg:block xl:block 2xl:block bg-slate-300 dark:bg-slate-700 opacity-40 grayscale hover:grayscale-0 hover:opacity-100" : "",
-              " relative after:absolute after:top-0 after:left-1/2 after:-translate-x-1/2 after:-translate-y-full after:text-center after:h-4 after:w-4  after:text  after:content-(--hour-value)")}
+              " text-xs relative after:absolute after:top-0 after:left-1/2 after:-translate-x-1/2 after:-translate-y-full after:text-center after:h-4 after:w-4  after:text-sm  after:content-(--hour-value)")}
             //    @ts-ignore
             style={{ "--hour-value": `'${hour}'` }}
           >

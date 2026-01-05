@@ -55,8 +55,8 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
       >
         <CardHeader
           className={cn(
-            "py-2 p-4",
-            viewType === "list" ? "p-4 py-0 flex-1 " : ""
+            " p-2 px-3",
+            viewType === "list" ? "p-2 py-0 flex-1 " : ""
           )}
         >
           <div
@@ -76,16 +76,17 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
               <CardTitle
                 className={cn(
                   "leading-tight  flex items-start w-full justify-between",
-                  viewType === "list" ? "text-base mt-0" : "text-lg mt-0"
+                  viewType === "list" ? "text-base mt-0" : "text-sm mt-0"
                 )}
               >
                 {deadline.subject}
-                <Badge
+                {/* <Badge
                   variant={getBadgeVariant(deadline.event_type)}
-                  className="shrink-0 ml-2"
+                  className="shrink-0 ml-2 "
+                  
                 >
                   {deadline.event_type}
-                </Badge>
+                </Badge> */}
               </CardTitle>
             </div>
             {/* {viewType === "card" && (
@@ -93,7 +94,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
 											)} */}
           </div>
           <CardDescription
-            className={cn("line-clamp-2", viewType === "list" ? "mt-1" : "")}
+            className={cn("line-clamp-2 text-xs", viewType === "list" ? "mt-1" : "")}
           >
             {deadline.title}
           </CardDescription>
@@ -115,8 +116,8 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
             )}
           >
             {deadline.lecturer && viewType === "card" && (
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
+              <div className="flex items-center gap-2 text-xs">
+                <User size={14} />
                 <span>{deadline.lecturer}</span>
               </div>
             )}
@@ -126,12 +127,12 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
                 viewType === "list" ? "items-center" : "justify-between w-full"
               )}
             >
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
+              <div className="flex items-center gap-2 text-xs">
+                <Calendar size={14} />
                 <span>{format(new Date(deadline.end_at), "PPP")}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
+              <div className="flex items-center gap-2 text-xs">
+                <Clock size={14} />
                 <span>{format(new Date(deadline.end_at), "HH:mm")}</span>
               </div>
             </div>
@@ -143,7 +144,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
             >
               <div
                 className={cn(
-                  "text-2xl flex items-center",
+                  "text-lg flex items-center",
                   viewType === "list" ? "justify-end" : "justify-between"
                 )}
               >
