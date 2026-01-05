@@ -32,7 +32,7 @@ export const WeekClasses: FC<WeekClassesProps> = ({
     "10:00-10:50",
     "11:00-11:50",
     "12:00-12:50",
-    "13:00-13:50",
+    "13:00-13:50\n13:05-13:55",
     "14:00-14:50",
     "15:00-15:50",
     "16:00-16:50",
@@ -50,6 +50,8 @@ export const WeekClasses: FC<WeekClassesProps> = ({
     "Friday",
     "Saturday",
   ];
+
+  console.log(allWeekSessions);
 
   return (
     <div className={cn("", className)}>
@@ -72,10 +74,10 @@ export const WeekClasses: FC<WeekClassesProps> = ({
           {timeSlots.map((slot, rowIdx) => (
             <TableRow key={rowIdx}>
               <TableCell className="font-medium bg-accent text-xs md:text-sm sticky left-0 z-10">
-                {slot}
+                {slot.split("\n")[0]}
               </TableCell>
               {allWeekSessions.map((sessionDay, dayIdx) => {
-                const session = sessionDay.find((s) => s.time === slot);
+                const session = sessionDay.find((s) => slot.includes(s.time));
                 return (
                   <TableCell
                     key={dayIdx}
