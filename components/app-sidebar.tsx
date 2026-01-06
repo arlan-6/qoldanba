@@ -57,11 +57,12 @@ export async function AppSidebar({
       collapsible="icon"
       {...props}
     >
-      <SidebarContent>
+      <SidebarContent className="overflow-hidden">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
+          <SidebarGroupLabel>Profile</SidebarGroupLabel>
                 <SidebarMenuButton
                   asChild
                   tooltip={fullName}
@@ -82,15 +83,9 @@ export async function AppSidebar({
               </SidebarMenuItem>
             </SidebarMenu>
             <SidebarSeparator className="my-2 mx-0" />
+            
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarMenu>
-              {/* <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Home">
-                  <Link href="/">
-                    <Home />
-                    <span>Home</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem> */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Dashboard">
                   <Link href="/my">
@@ -107,19 +102,12 @@ export async function AppSidebar({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Setings">
-                  <Link href="/settings">
-                    <Calendar />
-                    <span>Setings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem> */}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
         <div className="mt-auto p-2">
+          <SidebarGroupLabel>Support</SidebarGroupLabel>
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Questions?">
               <Link href="https://t.me/ArLaN_XD" target="_blank">

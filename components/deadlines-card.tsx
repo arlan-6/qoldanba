@@ -55,7 +55,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
       >
         <CardHeader
           className={cn(
-            " p-2 px-3",
+            " p-2 px-4 pt-3",
             viewType === "list" ? "p-2 py-0 flex-1 " : ""
           )}
         >
@@ -80,13 +80,13 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
                 )}
               >
                 {deadline.subject}
-                {/* <Badge
+                <Badge
                   variant={getBadgeVariant(deadline.event_type)}
-                  className="shrink-0 ml-2 "
+                  className="shrink-0 ml-2 p-0.5 px-1 text-[0.65rem] rounded-sm"
                   
                 >
                   {deadline.event_type}
-                </Badge> */}
+                </Badge>
               </CardTitle>
             </div>
             {/* {viewType === "card" && (
