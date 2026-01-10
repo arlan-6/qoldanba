@@ -67,6 +67,7 @@ const SessionsList = ({
     return [...acc, session];
   }, []);
 
+  console.log(lastSessionEndTime , currentTimePercent)
   return (
     <div>
       {mergedSessions.length > 0 && (

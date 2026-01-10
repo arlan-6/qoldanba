@@ -12,6 +12,7 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
+    
     <SidebarProvider defaultOpen={false}>
       <main className="min-h-screen flex-1 w-full">
         <Suspense
