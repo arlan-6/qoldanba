@@ -44,7 +44,7 @@ export async function AppSidebar({
   const metadata = user?.user_metadata || {};
   const fullName =
     metadata.full_name || metadata.name || metadata.user_name || "User";
-  const group = metadata.group.toUpperCase() || "Not assigned";
+  const group = metadata.group ? metadata.group.toUpperCase() : "Not assigned";
 
   const headersList = await headers();
   const currentUrl = headersList.get("x-pathname");
