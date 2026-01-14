@@ -3,7 +3,6 @@
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -15,24 +14,16 @@ import {
 } from "@/components/animate-ui/components/radix/sidebar";
 import { createClient } from "@/lib/supabase/server";
 import {
-  Home,
-  Calendar,
+  Calendar as CalendarIcon,
   LayoutDashboard,
   User,
-  Group,
   Users,
   MailQuestion,
-  ChevronDown,
   Link as LinkIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { headers } from "next/headers";
-import { LogoutButton } from "./logout-button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "./ui/collapsible";
+import SidebarCalendar, { Activity } from "./sidebar-calendar";
 
 export async function AppSidebar({
   ...props
@@ -45,6 +36,37 @@ export async function AppSidebar({
   const fullName =
     metadata.full_name || metadata.name || metadata.user_name || "User";
   const group = metadata.group ? metadata.group.toUpperCase() : "Not assigned";
+
+  const academic_year =
+    new Date().getMonth() < 7
+      ? `${new Date().getFullYear() - 1}-${new Date().getFullYear()}`
+      : `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
+
+  const course_year =
+    Number(academic_year.split("-")[1].slice(2)) -
+    Number(group.split("-")[1].slice(0, 2));
+
+const today = new Date().toISOString()
+
+const { data: currentTerm, error } = await supabase
+  .from("academic_calendar_activities")
+  .select("term")
+  .gte("end_date", today)
+  .lte("start_date", today)
+  .limit(1)
+  .single();
+
+
+
+  const { data: activities } = await supabase
+    .from("academic_calendar_activities")
+    .select("*")
+    .eq("program_level", metadata.degreeProgram)
+    .eq("course_year", course_year)
+    .eq("academic_year", academic_year)
+    // .eq("term", currentTerm?.term || "");
+
+  console.log(activities);
 
   const headersList = await headers();
   const currentUrl = headersList.get("x-pathname");
@@ -62,7 +84,7 @@ export async function AppSidebar({
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-          <SidebarGroupLabel>Profile</SidebarGroupLabel>
+                {/* <SidebarGroupLabel>Profile</SidebarGroupLabel> */}
                 <SidebarMenuButton
                   asChild
                   tooltip={fullName}
@@ -82,9 +104,9 @@ export async function AppSidebar({
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
-            <SidebarSeparator className="my-2 mx-0" />
-            
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+            {/* <SidebarSeparator className="my-2 mx-0" /> */}
+
+            <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip="Dashboard">
@@ -102,6 +124,18 @@ export async function AppSidebar({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Academic year">
+                  <Link href="/my/academic-year">
+                    <CalendarIcon />
+                    <span>Academic year</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                {/* Calendar */}
+                <SidebarCalendar activities={activities as Activity[]} />
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -117,7 +151,7 @@ export async function AppSidebar({
             </SidebarMenuButton>
           </SidebarMenuItem>
 
-          <SidebarSeparator className="my-2 mx-0" />
+          {/* <SidebarSeparator className="my-2 mx-0" /> */}
           <SidebarTrigger size={"lg"} />
         </div>
       </SidebarContent>

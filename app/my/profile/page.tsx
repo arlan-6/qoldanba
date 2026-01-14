@@ -13,7 +13,6 @@ import {
   Check,
   ExternalLink,
   ShieldCheck,
-  Calendar,
   Settings,
 } from "lucide-react";
 import {
@@ -26,7 +25,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 
 const ProfilePage = () => {
@@ -82,6 +80,7 @@ const ProfilePage = () => {
   const fullName = metadata.full_name || metadata.name || metadata.user_name || "User";
   const group = metadata.group || "Not assigned";
   const icsLink = metadata.icsLink || "";
+  const degreeProgram = metadata.degreeProgram || "";
   const avatarUrl = metadata.avatar_url;
 
   return (
@@ -113,6 +112,9 @@ const ProfilePage = () => {
                 <h2 className="mt-6 text-2xl font-bold truncate w-full">
                   {fullName}
                 </h2>
+                <p className="text-muted-foreground">
+                  {degreeProgram ? `${degreeProgram} degree` : ""}
+                </p>
                 <Badge
                   variant="outline"
                   className="mt-2 text-primary border-primary/20 bg-primary/5"
@@ -170,6 +172,15 @@ const ProfilePage = () => {
                     </label>
                     <div className="p-3 rounded-lg bg-muted/50 border border-border/50 font-medium">
                       {group}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5" />
+                      Degree Program
+                      </label>
+                    <div className="p-3 rounded-lg bg-muted/50 border border-border/50 font-medium">
+                      {degreeProgram || "Not assigned"}
                     </div>
                   </div>
                 </div>

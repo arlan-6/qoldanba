@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,66 +19,92 @@ import { toast } from "sonner";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
 
-
 export function OnboardingForm({
-    className,
-    ...props
+  className,
+  ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-    const [group, setGroup] = useState("");
-    const [icsLink, setIcsLink] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
+  const [group, setGroup] = useState("");
+  const [icsLink, setIcsLink] = useState("");
+  const [degreeProgram, setDegreeProgram] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-    const handleOnboarding = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const supabase = createClient();
-        setIsLoading(true);
-        setError(null);
 
-        try {
-            const { error } = await supabase.auth.updateUser({
-                data: {
-                    group: group,
-                    icsLink: icsLink,
-                },
-            });
-            if (error) throw error;
-            router.push("/my");
-        } catch (error: unknown) {
-            setError(error instanceof Error ? error.message : "An error occurred");
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
-    return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-2xl">Complete Profile</CardTitle>
-                    <CardDescription>
-                        Please provide the following information to continue.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleOnboarding}>
-                        <div className="flex flex-col gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="group">Group</Label>
-                                <Input
-                                    id="group"
-                                    type="text"
-                                    required
-                                    value={group}
-                                    onChange={(e) => setGroup(e.target.value)}
-                                    placeholder="BDA-2506"
-                                    pattern="[A-Z]{2,5}-\d{4}"
-                                    title="Group should be in format BDA-2506"
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="ics-link">
+  
+  const handleOnboarding = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const supabase = createClient();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          group: group,
+          icsLink: icsLink,
+          degreeProgram: degreeProgram,
+        },
+      });
+      if (error) throw error;
+      router.push("/my");
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Complete Profile</CardTitle>
+          <CardDescription>
+            Please provide the following information to continue.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleOnboarding}>
+            <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label htmlFor="group">Group</Label>
+                <Input
+                  id="group"
+                  type="text"
+                  required
+                  value={group}
+                  onChange={(e) => setGroup(e.target.value)}
+                  placeholder="BDA-2506"
+                  pattern="[A-Z]{2,5}-\d{4}"
+                  title="Group should be in format BDA-2506"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="degree-program">Degree Program</Label>
+                <select
+                  id="degree-program"
+                  required
+                  value={degreeProgram}
+                  onChange={(e) => setDegreeProgram(e.target.value)}
+                  className="flex h-10 rounded-md border border-input bg-accent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Select a degree program</option>
+                  <option value="Bachelor">
+                    Bachelor degree
+                  </option>
+                  <option value="Master">
+                    Master degree
+                  </option>
+                  <option value="Phd">
+                    Phd degree
+                  </option>
+                </select>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="ics-link">
                   ICS Link
                   <Tooltip>
                     <TooltipTrigger
@@ -132,15 +158,15 @@ export function OnboardingForm({
                     https://lms.astanait.edu.kz/calendar/export.php?
                   </Link>
                 </div>
-                            </div>
-                            {error && <p className="text-sm text-red-500">{error}</p>}
-                            <Button type="submit" className="w-full" disabled={isLoading}>
-                                {isLoading ? "Saving..." : "Save & Continue"}
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
-    );
+              </div>
+              {error && <p className="text-sm text-red-500">{error}</p>}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Saving..." : "Save & Continue"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
