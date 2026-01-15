@@ -330,7 +330,7 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
                 );
               })}
             </div>
-            <ScrollBar orientation="horizontal" hidden/>
+            <ScrollBar orientation="horizontal" />
           </ScrollArea>
         )}
       </div>
