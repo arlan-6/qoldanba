@@ -23,8 +23,10 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // console.log("USER METADATA:", user);
+
   if (!user) {
-    redirect("/auth/login");
+    redirect("/auth/github");
   }
 
   // Parallel fetch: schedule + initial deadlines
