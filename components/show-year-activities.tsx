@@ -11,6 +11,7 @@ import {
 } from "./ui/card";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type Color =
   | "green"
@@ -100,7 +101,7 @@ const colorStyles: Record<Color, { dot: string; badge: string }> = {
       "border-indigo-500/30 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300",
   },
 };
-
+export { colorStyles };
 const termLabels = ["Pre-term", "Fall", "Spring", "Summer"];
 
 function formatDateRange(start: string, end: string) {
@@ -110,17 +111,24 @@ function formatDateRange(start: string, end: string) {
 }
 
 const YearActivities = ({ activities }: { activities: Activity[] }) => {
+  const typeLegend = Array.from(new Set(activities.map((a) => a.type)));
+
+  const [showActivities, setShowActivities] = useState<string[]>(typeLegend);
+
+  // useEffect(() => {
+  //   // Your effect logic here
+  // }, [showActivities, setShowActivities]);
+
   const device = DeviceDetection();
 
-  const activitiesByTerms = termLabels.map((term) =>
-    activities.filter((activity) => activity.term === term)
-  );
-  const typeLegend = Array.from(new Set(activities.map((a) => a.type)));
+  // const activitiesByTerms = termLabels.map((term) =>
+  //   activities.filter((activity) => activity.term === term)
+  // );
 
   return (
     <div className="grid gap-6 w-full">
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="">
+        <CardHeader className="pb-3 pt-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               {/* <CardTitle className="text-lg">Academic calendar</CardTitle> */}
@@ -133,18 +141,31 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
           {typeLegend.length > 0 && (
             <div className="flex flex-wrap gap-2 pt-2">
               {typeLegend.map((type) => {
+                const isOn = showActivities.includes(type);
                 const color = colorByType(type);
                 const styles = colorStyles[color];
                 return (
                   <span
                     key={type}
                     className={cn(
-                      "inline-flex items-center gap-2 rounded-full border px-2 py-1 text-xs",
+                      "inline-flex items-center gap-2 rounded-full border px-2 py-1 text-xs cursor-pointer",
                       styles.badge
                     )}
+                    onClick={() => {
+                      if (isOn) {
+                        setShowActivities((prev) =>
+                          prev.filter((t) => t !== type)
+                        );
+                      } else {
+                        setShowActivities((prev) => [...prev, type]);
+                      }
+                    }}
                   >
                     <span
-                      className={cn("h-2 w-2 rounded-full", styles.dot)}
+                      className={cn(
+                        "h-2 w-2 rounded-full ",
+                        isOn ? styles.dot : "opacity-30"
+                      )}
                       aria-hidden
                     />
                     {type}
@@ -154,9 +175,9 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
             </div>
           )}
         </CardHeader>
-        <CardContent className="p-2 pt-0 ">
+        <CardContent className="p-2 pt-0 aspect-square md:aspect-auto">
           <Calendar
-            className="w-full rounded-xl border bg-card p-2"
+            className="w-full rounded-xl md:border bg-card p-2"
             numberOfMonths={
               device === "desktop" ? 5 : device === "tablet" ? 3 : 1
             }
@@ -171,6 +192,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "green" &&
+                    showActivities.includes(activity.type) &&
                     isInRange(
                       d,
                       new Date(activity.start_date),
@@ -181,12 +203,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "green" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               greenEnd: (d) =>
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "green" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.end_date))
                 ),
 
@@ -194,6 +218,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "blue" &&
+                    showActivities.includes(activity.type) &&
                     isInRange(
                       d,
                       new Date(activity.start_date),
@@ -204,12 +229,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "blue" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               blueEnd: (d) =>
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "blue" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.end_date))
                 ),
 
@@ -217,6 +244,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "red" &&
+                    showActivities.includes(activity.type) &&
                     isInRange(
                       d,
                       new Date(activity.start_date),
@@ -227,12 +255,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "red" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               redEnd: (d) =>
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "red" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.end_date))
                 ),
 
@@ -240,6 +270,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "yellow" &&
+                    showActivities.includes(activity.type) &&
                     isInRange(
                       d,
                       new Date(activity.start_date),
@@ -250,12 +281,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "yellow" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               yellowEnd: (d) =>
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "yellow" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.end_date))
                 ),
 
@@ -263,6 +296,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "purple" &&
+                    showActivities.includes(activity.type) &&
                     isInRange(
                       d,
                       new Date(activity.start_date),
@@ -273,12 +307,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "purple" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               purpleEnd: (d) =>
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "purple" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.end_date))
                 ),
 
@@ -286,6 +322,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "pink" &&
+                    showActivities.includes(activity.type) &&
                     isInRange(
                       d,
                       new Date(activity.start_date),
@@ -296,12 +333,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "pink" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               pinkEnd: (d) =>
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "pink" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.end_date))
                 ),
 
@@ -309,6 +348,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "indigo" &&
+                    showActivities.includes(activity.type) &&
                     isInRange(
                       d,
                       new Date(activity.start_date),
@@ -319,12 +359,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "indigo" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               indigoEnd: (d) =>
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "indigo" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.end_date))
                 ),
 
@@ -332,6 +374,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "gray" &&
+                    showActivities.includes(activity.type) &&
                     isInRange(
                       d,
                       new Date(activity.start_date),
@@ -342,24 +385,30 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "gray" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               grayEnd: (d) =>
                 activities.some(
                   (activity) =>
                     colorByType(activity.type) === "gray" &&
+                    showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.end_date))
                 ),
             }}
             modifiersClassNames={{
-              green: "bg-green-500 text-white",
-              blue: "bg-blue-500 text-white",
-              red: "bg-red-500 text-white",
-              yellow: "bg-yellow-500 text-white",
-              purple: "bg-purple-500 text-white",
-              pink: "bg-pink-500 text-white",
-              indigo: "bg-indigo-500 text-white",
-            //   gray: "bg-gray-500 text-white",
+              green:
+                "bg-green-300/10 border-b-green-500 border-b-2 text-black dark:text-white ",
+              blue: "bg-blue-300/10 border-b-blue-500 border-b-2 text-black dark:text-white",
+              red: "bg-red-300/10 border-b-red-500 border-b-2 text-black dark:text-white",
+              yellow:
+                "bg-yellow-300/10 border-b-yellow-500 border-b-2 text-black dark:text-white ",
+              purple:
+                "bg-purple-300/10 border-b-purple-500 border-b-2 text-black dark:text-white",
+              pink: "bg-pink-300/10 border-b-pink-500 border-b-2 text-black dark:text-white",
+              indigo:
+                "bg-indigo-300/10 border-b-indigo-500 border-b-2 text-black dark:text-white",
+              //   gray: "bg-gray-500 text-white",
 
               greenStart: "rounded-l-md",
               greenEnd: "rounded-r-md",
@@ -481,8 +530,6 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
           );
         })}
       </div> */}
-
-      
     </div>
   );
 };

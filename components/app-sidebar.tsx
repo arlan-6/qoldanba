@@ -66,7 +66,7 @@ const { data: currentTerm, error } = await supabase
     .eq("academic_year", academic_year)
     // .eq("term", currentTerm?.term || "");
 
-  console.log(activities);
+  // console.log(activities);
 
   const headersList = await headers();
   const currentUrl = headersList.get("x-pathname");

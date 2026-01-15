@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 export default function SidebarTriggerNav() {
 
     const router = usePathname()
-    if(router != "/my") return null
+    if(!router.startsWith("/my")) return null
     return (
         <SidebarTrigger  className="block md:hidden"/>
     )

@@ -25,7 +25,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
   useEffect(() => {
     const timer = setInterval(() => {
       setTick((tick) => tick + 1);
-    }, 1000);
+    }, 1000*60);
     return () => clearInterval(timer);
   }, []);
   return (

@@ -63,7 +63,7 @@ const AcademicYearPage = async () => {
       </div>
       <div className="">
         <h3>
-            Public and national holidays, carrying the holidays
+            {/* Public and national holidays, carrying the holidays */}
         </h3>
       </div>
     </div>
