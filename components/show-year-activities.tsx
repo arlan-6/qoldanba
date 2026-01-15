@@ -110,8 +110,9 @@ function formatDateRange(start: string, end: string) {
   ).toLocaleDateString()}`;
 }
 
-const YearActivities = ({ activities }: { activities: Activity[] }) => {
-  const typeLegend = Array.from(new Set(activities.map((a) => a.type)));
+const YearActivities = ({ activities }: { activities?: Activity[] }) => {
+  const safeActivities = activities ?? [];
+  const typeLegend = Array.from(new Set(safeActivities.map((a) => a.type)));
 
   const [showActivities, setShowActivities] = useState<string[]>(typeLegend);
 
@@ -135,7 +136,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
               <CardDescription>Key dates and activity ranges</CardDescription>
             </div>
             <Badge variant="secondary" className="w-fit">
-              {activities.length} activities
+              {safeActivities.length} activities
             </Badge>
           </div>
           {typeLegend.length > 0 && (
@@ -189,7 +190,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
             onSelect={() => {}}
             modifiers={{
               green: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "green" &&
                     showActivities.includes(activity.type) &&
@@ -200,14 +201,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                     )
                 ),
               greenStart: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "green" &&
                     showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               greenEnd: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "green" &&
                     showActivities.includes(activity.type) &&
@@ -215,7 +216,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 ),
 
               blue: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "blue" &&
                     showActivities.includes(activity.type) &&
@@ -226,14 +227,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                     )
                 ),
               blueStart: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "blue" &&
                     showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               blueEnd: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "blue" &&
                     showActivities.includes(activity.type) &&
@@ -241,7 +242,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 ),
 
               red: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "red" &&
                     showActivities.includes(activity.type) &&
@@ -252,14 +253,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                     )
                 ),
               redStart: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "red" &&
                     showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               redEnd: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "red" &&
                     showActivities.includes(activity.type) &&
@@ -267,7 +268,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 ),
 
               yellow: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "yellow" &&
                     showActivities.includes(activity.type) &&
@@ -278,14 +279,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                     )
                 ),
               yellowStart: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "yellow" &&
                     showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               yellowEnd: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "yellow" &&
                     showActivities.includes(activity.type) &&
@@ -293,7 +294,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 ),
 
               purple: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "purple" &&
                     showActivities.includes(activity.type) &&
@@ -304,14 +305,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                     )
                 ),
               purpleStart: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "purple" &&
                     showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               purpleEnd: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "purple" &&
                     showActivities.includes(activity.type) &&
@@ -319,7 +320,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 ),
 
               pink: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "pink" &&
                     showActivities.includes(activity.type) &&
@@ -330,14 +331,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                     )
                 ),
               pinkStart: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "pink" &&
                     showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               pinkEnd: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "pink" &&
                     showActivities.includes(activity.type) &&
@@ -345,7 +346,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 ),
 
               indigo: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "indigo" &&
                     showActivities.includes(activity.type) &&
@@ -356,14 +357,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                     )
                 ),
               indigoStart: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "indigo" &&
                     showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               indigoEnd: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "indigo" &&
                     showActivities.includes(activity.type) &&
@@ -371,7 +372,7 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                 ),
 
               gray: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "gray" &&
                     showActivities.includes(activity.type) &&
@@ -382,14 +383,14 @@ const YearActivities = ({ activities }: { activities: Activity[] }) => {
                     )
                 ),
               grayStart: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "gray" &&
                     showActivities.includes(activity.type) &&
                     isSameDay(d, new Date(activity.start_date))
                 ),
               grayEnd: (d) =>
-                activities.some(
+                safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "gray" &&
                     showActivities.includes(activity.type) &&

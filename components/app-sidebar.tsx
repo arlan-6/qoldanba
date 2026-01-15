@@ -42,9 +42,18 @@ export async function AppSidebar({
       ? `${new Date().getFullYear() - 1}-${new Date().getFullYear()}`
       : `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
 
-  const course_year = metadata.group?
-    Number(academic_year.split("-")[1].slice(2)) -
-    Number(group.split("-")[1].slice(0, 2)):0
+  const parseCourseYear = (groupValue: string) => {
+    const parts = groupValue.split("-");
+    if (parts.length < 2) return 0;
+    const academicSuffix = academic_year.split("-")[1]?.slice(2);
+    const groupYear = parts[1]?.slice(0, 2);
+    const academicYear = Number(academicSuffix);
+    const groupYearNumber = Number(groupYear);
+    if (Number.isNaN(academicYear) || Number.isNaN(groupYearNumber)) return 0;
+    return academicYear - groupYearNumber;
+  };
+
+  const course_year = metadata.group ? parseCourseYear(group) : 0;
 
 const today = new Date().toISOString()
 
@@ -65,6 +74,7 @@ const { data: currentTerm, error } = await supabase
     .eq("course_year", course_year)
     .eq("academic_year", academic_year)
     // .eq("term", currentTerm?.term || "");
+  const activitiesList = activities ?? [];
 
   // console.log(activities);
 
@@ -134,7 +144,7 @@ const { data: currentTerm, error } = await supabase
               </SidebarMenuItem>
               <SidebarMenuItem>
                 {/* Calendar */}
-                <SidebarCalendar activities={activities as Activity[]} />
+                <SidebarCalendar activities={activitiesList as Activity[]} />
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

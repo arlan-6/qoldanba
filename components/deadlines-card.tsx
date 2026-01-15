@@ -20,7 +20,12 @@ interface DeadlinesCardProps {
 }
 
 const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
+  if (!deadline) return null;
   const [, setTick] = useState(0);
+  const endAt = deadline.end_at ? new Date(deadline.end_at) : null;
+  const daysUntil = endAt ? dayCountUntillToday(endAt) : null;
+  const dueSoon = endAt ? dayCountUntillToday(endAt, 7) : false;
+  const dueNow = endAt ? dayCountUntillToday(endAt, 1) : false;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -47,10 +52,8 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
         className={cn(
           "flex transition-all hover:bg-accent/50 group",
           viewType === "card" ? "flex-col" : "flex-row items-center",
-          dayCountUntillToday(new Date(deadline.end_at), 7) &&
-            "border-blue-500/50",
-          dayCountUntillToday(new Date(deadline.end_at), 1) &&
-            "border-destructive/50"
+          dueSoon && "border-blue-500/50",
+          dueNow && "border-destructive/50"
         )}
       >
         <CardHeader
@@ -103,7 +106,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
           className={cn(
             "flex-1",
             viewType === "list"
-              ? "p-4 pt-4 flex-none w-[200px] md:w-[300px]"
+              ? "p-4 pt-4 flex-none w-50 md:w-75"
               : "pb-3"
           )}
         >
@@ -129,11 +132,11 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
             >
               <div className="flex items-center gap-2 text-xs">
                 <Calendar size={14} />
-                <span>{format(new Date(deadline.end_at), "PPP")}</span>
+                <span>{endAt ? format(endAt, "PPP") : "TBD"}</span>
               </div>
               <div className="flex items-center gap-2 text-xs">
                 <Clock size={14} />
-                <span>{format(new Date(deadline.end_at), "HH:mm")}</span>
+                <span>{endAt ? format(endAt, "HH:mm") : "TBD"}</span>
               </div>
             </div>
             <div
@@ -149,14 +152,14 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
                 )}
               >
                 <span className={cn(viewType === "list" && "text-lg mr-4")}>
-                  {dayCountUntillToday(new Date(deadline.end_at))}
+                  {daysUntil ?? "TBD"}
                 </span>
-                {dayCountUntillToday(new Date(deadline.end_at), 1) ? (
+                {dueNow ? (
                   <Badge className="flex items-center animate-pulse duration-1000 bg-destructive/50 hover:bg-destructive/20  border-destructive/50 text-destructive-foreground">
                     <AlertOctagon size={16} className="mr-2 my-0.5" /> {"<"}1d
                   </Badge>
                 ) : (
-                  dayCountUntillToday(new Date(deadline.end_at), 7) && (
+                  dueSoon && (
                     <Badge className="flex items-center  bg-blue-500/50 hover:bg-blue-500/20  border-blue-500/50 text-blue-500">
                       <Flag size={16} className="mr-2 my-0.5" /> {"<"}
                       7d

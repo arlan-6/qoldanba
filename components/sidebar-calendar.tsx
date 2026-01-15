@@ -71,14 +71,15 @@ function colorByType(type: string): Color {
   }
 }
 
-const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
+const SidebarCalendar = ({ activities }: { activities?: Activity[] }) => {
+  const safeActivities = activities ?? [];
   const { state, isMobile } = useSidebar();
   const [typeLegend, setTypeLegend] = React.useState<string[]>([]);
   // const typeLegend = Array.from(new Set(activities.map((a) => a.type)));
   const handleMonthChange = (date: Date) => {
     // console.log("Month changed to:", date);
     const month = date.getMonth() + 1; // Months are zero-based
-    const thisMonthActivities = activities.filter((activity) => {
+    const thisMonthActivities = safeActivities.filter((activity) => {
       const startMonth = new Date(activity.start_date).getMonth() + 1;
       const endMonth = new Date(activity.end_date).getMonth() + 1;
       if (activity.type === "study") return false;
@@ -95,7 +96,7 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
   React.useEffect(() => {
     const today = new Date();
     handleMonthChange(today);
-  }, [activities, setTypeLegend]);
+  }, [safeActivities, setTypeLegend]);
 
   if (state !== "expanded" && !isMobile) return null;
 
@@ -116,7 +117,7 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
         className="w-full border-0 p-0 bg-transparent text-sm"
         modifiers={{
           green: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "green" &&
                 isInRange(
@@ -126,20 +127,20 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
                 )
             ),
           greenStart: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "green" &&
                 isSameDay(d, new Date(activity.start_date))
             ),
           greenEnd: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "green" &&
                 isSameDay(d, new Date(activity.end_date))
             ),
 
           blue: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "blue" &&
                 isInRange(
@@ -149,20 +150,20 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
                 )
             ),
           blueStart: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "blue" &&
                 isSameDay(d, new Date(activity.start_date))
             ),
           blueEnd: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "blue" &&
                 isSameDay(d, new Date(activity.end_date))
             ),
 
           red: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "red" &&
                 isInRange(
@@ -172,20 +173,20 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
                 )
             ),
           redStart: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "red" &&
                 isSameDay(d, new Date(activity.start_date))
             ),
           redEnd: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "red" &&
                 isSameDay(d, new Date(activity.end_date))
             ),
 
           yellow: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "yellow" &&
                 isInRange(
@@ -195,20 +196,20 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
                 )
             ),
           yellowStart: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "yellow" &&
                 isSameDay(d, new Date(activity.start_date))
             ),
           yellowEnd: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "yellow" &&
                 isSameDay(d, new Date(activity.end_date))
             ),
 
           purple: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "purple" &&
                 isInRange(
@@ -218,20 +219,20 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
                 )
             ),
           purpleStart: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "purple" &&
                 isSameDay(d, new Date(activity.start_date))
             ),
           purpleEnd: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "purple" &&
                 isSameDay(d, new Date(activity.end_date))
             ),
 
           pink: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "pink" &&
                 isInRange(
@@ -241,20 +242,20 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
                 )
             ),
           pinkStart: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "pink" &&
                 isSameDay(d, new Date(activity.start_date))
             ),
           pinkEnd: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "pink" &&
                 isSameDay(d, new Date(activity.end_date))
             ),
 
           indigo: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "indigo" &&
                 isInRange(
@@ -264,13 +265,13 @@ const SidebarCalendar = ({ activities }: { activities: Activity[] }) => {
                 )
             ),
           indigoStart: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "indigo" &&
                 isSameDay(d, new Date(activity.start_date))
             ),
           indigoEnd: (d) =>
-            activities.some(
+            safeActivities.some(
               (activity) =>
                 colorByType(activity.type) === "indigo" &&
                 isSameDay(d, new Date(activity.end_date))

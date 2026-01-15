@@ -21,6 +21,7 @@ const SessionsList = ({
   lastSessionEndTime,
   isTomorrow,
 }: SessionsListProps) => {
+  const safeSessions = Array.isArray(sessions) ? sessions : [];
   const toMinutes = (time: string) => {
     const [hours, minutes] = time.split(":").map((part) => Number(part));
     if (Number.isNaN(hours) || Number.isNaN(minutes)) return null;
@@ -41,7 +42,7 @@ const SessionsList = ({
     return left.every((name, index) => name === right[index]);
   };
 
-  const mergedSessions = sessions.reduce<Session[]>((acc, session) => {
+  const mergedSessions = safeSessions.reduce<Session[]>((acc, session) => {
     const last = acc[acc.length - 1];
     if (!last) return [...acc, session];
 
@@ -78,6 +79,9 @@ const SessionsList = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {mergedSessions.map((session, index) => {
               if (session.classroom === "online") return;
+              const lecturers = Array.isArray(session.lecturer)
+                ? session.lecturer
+                : [];
 
               return (
                 <div
@@ -113,11 +117,11 @@ const SessionsList = ({
                   <div className="flex items-start gap-2">
                     <User className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <span className="text-xs text-muted-foreground leading-relaxed">
-                      {session.lecturer.length > 2
-                        ? `${session.lecturer.slice(0, 1).join(", ")}, +${
-                            session.lecturer.length - 1
+                      {lecturers.length > 2
+                        ? `${lecturers.slice(0, 1).join(", ")}, +${
+                            lecturers.length - 1
                           } more`
-                        : session.lecturer.join(", ")}
+                        : lecturers.join(", ")}
                     </span>
                     <span
                       className={cn(
