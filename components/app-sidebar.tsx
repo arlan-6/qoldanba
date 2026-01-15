@@ -42,9 +42,9 @@ export async function AppSidebar({
       ? `${new Date().getFullYear() - 1}-${new Date().getFullYear()}`
       : `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`;
 
-  const course_year =
+  const course_year = metadata.group?
     Number(academic_year.split("-")[1].slice(2)) -
-    Number(group.split("-")[1].slice(0, 2));
+    Number(group.split("-")[1].slice(0, 2)):0
 
 const today = new Date().toISOString()
 
