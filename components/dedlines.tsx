@@ -58,7 +58,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
         className={cn(
           viewType === "card"
             ? "grid gap-3 md:grid-cols-2 lg:grid-cols-4"
-            : "flex flex-col gap-3"
+            : "grid lg:grid-cols-2 gap-2"
         )}
       >
         {filteredDeadlines.length > 0 ? (

@@ -30,7 +30,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
   useEffect(() => {
     const timer = setInterval(() => {
       setTick((tick) => tick + 1);
-    }, 1000*60);
+    }, 1000 * 60);
     return () => clearInterval(timer);
   }, []);
   return (
@@ -51,7 +51,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
         key={deadline.id}
         className={cn(
           "flex transition-all hover:bg-accent/50 group",
-          viewType === "card" ? "flex-col" : "flex-row items-center",
+          viewType === "card" ? "flex-col" : "flex-row items-center rounded-sm",
           dueSoon && "border-blue-500/50",
           dueNow && "border-destructive/50"
         )}
@@ -79,14 +79,13 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
               <CardTitle
                 className={cn(
                   "leading-tight  flex items-start w-full justify-between",
-                  viewType === "list" ? "text-base mt-0" : "text-sm mt-0"
+                  viewType === "list" ? "text-sm ml-1" : "text-sm mt-0"
                 )}
               >
                 {deadline.subject}
                 <Badge
                   variant={getBadgeVariant(deadline.event_type)}
                   className="shrink-0 ml-2 p-0.5 px-1 text-[0.65rem] rounded-sm"
-                  
                 >
                   {deadline.event_type}
                 </Badge>
@@ -97,7 +96,10 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
 											)} */}
           </div>
           <CardDescription
-            className={cn("line-clamp-2 text-xs", viewType === "list" ? "mt-1" : "")}
+            className={cn(
+              "line-clamp-2 text-xs",
+              viewType === "list" ? "mt-1" : ""
+            )}
           >
             {deadline.title}
           </CardDescription>
@@ -105,9 +107,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
         <CardContent
           className={cn(
             "flex-1",
-            viewType === "list"
-              ? "p-4 pt-4 flex-none w-50 md:w-75"
-              : "pb-3"
+            viewType === "list" ? "p-2 flex-none w-50 md:w-75" : "pb-3"
           )}
         >
           <div
@@ -148,24 +148,41 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
               <div
                 className={cn(
                   "text-lg flex items-center",
-                  viewType === "list" ? "justify-end" : "justify-between"
+                  viewType === "list"
+                    ? "justify-end"
+                    : dueNow || dueSoon
+                    ? "justify-between"
+                    : "justify-end"
                 )}
               >
-                <span className={cn(viewType === "list" && "text-lg mr-4")}>
-                  {daysUntil ?? "TBD"}
-                </span>
                 {dueNow ? (
                   <Badge className="flex items-center animate-pulse duration-1000 bg-destructive/50 hover:bg-destructive/20  border-destructive/50 text-destructive-foreground">
-                    <AlertOctagon size={16} className="mr-2 my-0.5" /> {"<"}1d
+                    <AlertOctagon
+                      size={viewType === "list" ? 12 : 16}
+                      className="mr-2 my-0.5"
+                    />{" "}
+                    {"<"}1d
                   </Badge>
                 ) : (
                   dueSoon && (
                     <Badge className="flex items-center  bg-blue-500/50 hover:bg-blue-500/20  border-blue-500/50 text-blue-500">
-                      <Flag size={16} className="mr-2 my-0.5" /> {"<"}
+                      <Flag
+                        size={viewType === "list" ? 12 : 16}
+                        className="mr-2 my-0.5"
+                      />{" "}
+                      {"<"}
                       7d
                     </Badge>
                   )
                 )}
+                <span
+                  className={cn(
+                    viewType === "list" && "text-sm ml-4 ",
+                    "text-accent-foreground"
+                  )}
+                >
+                  {daysUntil ?? "TBD"}
+                </span>
               </div>
             </div>
           </div>
