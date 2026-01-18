@@ -193,7 +193,7 @@ export async function AppSidebar({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarTrigger size={"lg"} />
+            <SidebarTrigger className="cursor-pointer" size={"lg"} />
           </div>
         </SidebarContent>
       </Sidebar>
