@@ -71,11 +71,11 @@ const SessionsList = ({
   // console.log(lastSessionEndTime , currentTimePercent)
   return (
     <div>
-      {mergedSessions.length > 0 && (
-        <div className="mt-4">
-          <h3 className="text-base font-semibold mb-2">
+      {mergedSessions.length > 0 ? (
+        <div className="mt-8">
+          {/* <h3 className="text-base font-semibold mb-2">
             {isTomorrow ? "Tomorrow's Classes" : "Today's Classes"}
-          </h3>
+          </h3> */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {mergedSessions.map((session, index) => {
               if (session.classroom === "online") return;
@@ -139,7 +139,13 @@ const SessionsList = ({
             })}
           </div>
         </div>
-      )}
+      ):(<>
+        <div className="m-6">
+          <blockquote className="border-l-2 border-yellow-500 pl-6 italic text-muted-foreground">
+            No classes scheduled for today. Enjoy your free time! ;D
+          </blockquote>
+        </div>
+      </>)}
       {/* All passed message */}
       {mergedSessions.length > 0 && currentTimePercent > lastSessionEndTime && (
         <div className="m-6">
