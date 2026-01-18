@@ -19,8 +19,8 @@ interface TimeStepsProps {
 const TimeSteps: React.FC<TimeStepsProps> = ({ daySchedule,showALL }) => {
   // All hours from 7 to 21
   const hours = [
-    "06",
-    "07",
+    // "06",
+    // "07",
     "08",
     "09",
     "10",

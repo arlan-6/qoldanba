@@ -18,7 +18,7 @@ const convertToProportionalProgress = (linearPercent: number): number => {
   const hour = (linearPercent / 100) * 24;
 
   // Fixed range: 7-21 (15 hours total)
-  const start = 6;
+  const start = 8;
   const end = 20;
   const totalHours = end - start;
 
@@ -141,7 +141,7 @@ function Progress({
       className={cn(
         // Base styling for the time slot indicator
         "absolute my-0.5 h-2 w-20 transition-all duration-200 cursor-pointer rounded-sm",
-        "hover:scale-110 hover:shadow-lg hover:z-20",
+        "hover:scale-110 hover:shadow-lg hover:z-20 first:ml-0.5",
         "w-[5.8%]", // Assuming width calculation is correct
 
         // Passed sessions: Muted, low-opacity look
@@ -150,7 +150,7 @@ function Progress({
 
         // Current session: Pulsing ring using the theme's primary accent
         status === "current" &&
-          "ring-2 ring-offset-1 ring-primary z-10 animate-pulse",
+          "ring-2 ring-offset-1  z-10  ",
 
         // Session type-based coloring (used for upcoming/online/current)
         status !== "passed" &&
