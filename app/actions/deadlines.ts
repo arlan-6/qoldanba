@@ -13,7 +13,23 @@ export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) 
   if (!user) return { error: 'Unauthorized' };
 
   try {
-    const res = await fetch(icsUrl);
+    try {
+      const parsed = new URL(icsUrl);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return { error: 'Invalid protocol' };
+      }
+    } catch {
+      return { error: 'Invalid URL' };
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    let res: Response;
+    try {
+      res = await fetch(icsUrl, { signal: controller.signal });
+    } finally {
+      clearTimeout(timeoutId);
+    }
     if (!res.ok) throw new Error('Failed to fetch ICS');
     const icsText = await res.text();
     const events = parseIcsEvents(icsText);
@@ -21,35 +37,33 @@ export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) 
     if (events.length === 0) return { count: 0 };
 
     const rows = events
-    .filter((ev) => !!!ev.SUMMARY?.toLocaleLowerCase().includes('attendance')) // Skip events with 'Attendance' in the title
-    
-    .map((ev) => {
-      const categories = ev.CATEGORIES ?? '';
-      const [subject, lecturer] = categories.split('|').map((s) => s.trim());
-      const title = ev.SUMMARY ?? 'Untitled';
-      const eventType = detectEventType(title);
-      // console.log(ev.SUMMARY);
-      
-      return {
-        user_id: user.id,
-        ics_uid: ev.UID,
-        source: 'lms',
-        title,
-        description: ev.DESCRIPTION || null,
-        event_type: eventType,
-        subject: subject || null,
-        lecturer: lecturer || null,
-        start_at: parseIcsDate(ev.DTSTART),
-        end_at: parseIcsDate(ev.DTEND),
-        ics_last_modified: ev['LAST-MODIFIED'] ? parseIcsDate(ev['LAST-MODIFIED']) : null,
-        ics_dtstamp: ev.DTSTAMP ? parseIcsDate(ev.DTSTAMP) : null,
-        raw_vevent: ev.__raw,
-      };
-    })
-    .filter((row) => {
-      if (!row.end_at) return true; // Keep if no end date
-      return new Date(row.end_at) > new Date(); // Keep only future deadlines
-    });
+      .filter((ev) => !!!ev.SUMMARY?.toLowerCase().includes('attendance')) // Skip events with 'Attendance' in the title
+      .map((ev) => {
+        const categories = ev.CATEGORIES ?? '';
+        const [subject, lecturer] = categories.split('|').map((s) => s.trim());
+        const title = ev.SUMMARY ?? 'Untitled';
+        const eventType = detectEventType(title);
+
+        return {
+          user_id: user.id,
+          ics_uid: ev.UID,
+          source: 'lms',
+          title,
+          description: ev.DESCRIPTION || null,
+          event_type: eventType,
+          subject: subject || null,
+          lecturer: lecturer || null,
+          start_at: parseIcsDate(ev.DTSTART),
+          end_at: parseIcsDate(ev.DTEND),
+          ics_last_modified: ev['LAST-MODIFIED'] ? parseIcsDate(ev['LAST-MODIFIED']) : null,
+          ics_dtstamp: ev.DTSTAMP ? parseIcsDate(ev.DTSTAMP) : null,
+          raw_vevent: ev.__raw,
+        };
+      })
+      .filter((row) => {
+        if (!row.end_at) return true; // Keep if no end date
+        return new Date(row.end_at) > new Date(); // Keep only future deadlines
+      });
 
     const { error } = await supabase
       .from('deadlines')

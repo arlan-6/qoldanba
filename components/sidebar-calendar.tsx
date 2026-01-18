@@ -35,13 +35,12 @@ function dayKey(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 }
 
-function isInRange(date: Date, from: Date, to: Date) {
-  const x = dayKey(date);
-  return x >= dayKey(from) && x <= dayKey(to);
+function isInRangeKey(key: number, fromKey: number, toKey: number) {
+  return key >= fromKey && key <= toKey;
 }
 
-function isSameDay(a: Date, b: Date) {
-  return dayKey(a) === dayKey(b);
+function isSameDayKey(aKey: number, bKey: number) {
+  return aKey === bKey;
 }
 
 function colorByType(type: string): Color {
@@ -75,15 +74,33 @@ const SidebarCalendar = ({ activities }: { activities?: Activity[] }) => {
   const safeActivities = activities ?? [];
   const { state, isMobile } = useSidebar();
   const [typeLegend, setTypeLegend] = React.useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
+
+  const parsedActivities = React.useMemo(() => {
+    return safeActivities.map((activity) => {
+      const start = new Date(activity.start_date);
+      const end = new Date(activity.end_date);
+      const startKey = dayKey(start);
+      const endKey = dayKey(end);
+      return {
+        ...activity,
+        start,
+        end,
+        startKey,
+        endKey,
+        startMonth: start.getMonth() + 1,
+        endMonth: end.getMonth() + 1,
+        color: colorByType(activity.type),
+      };
+    });
+  }, [safeActivities]);
   // const typeLegend = Array.from(new Set(activities.map((a) => a.type)));
   const handleMonthChange = (date: Date) => {
     // console.log("Month changed to:", date);
     const month = date.getMonth() + 1; // Months are zero-based
-    const thisMonthActivities = safeActivities.filter((activity) => {
-      const startMonth = new Date(activity.start_date).getMonth() + 1;
-      const endMonth = new Date(activity.end_date).getMonth() + 1;
+    const thisMonthActivities = parsedActivities.filter((activity) => {
       if (activity.type === "study") return false;
-      return month == startMonth || month == endMonth;
+      return month == activity.startMonth || month == activity.endMonth;
     });
 
     const newTypeLegend = Array.from(
@@ -96,7 +113,11 @@ const SidebarCalendar = ({ activities }: { activities?: Activity[] }) => {
   React.useEffect(() => {
     const today = new Date();
     handleMonthChange(today);
-  }, [safeActivities, setTypeLegend]);
+  }, [parsedActivities, setTypeLegend]);
+  
+  React.useEffect(() => {
+    setSelectedDate(new Date());
+  }, []);
 
   if (state !== "expanded" && !isMobile) return null;
 
@@ -108,7 +129,7 @@ const SidebarCalendar = ({ activities }: { activities?: Activity[] }) => {
     >
       <Calendar
         mode="single"
-        selected={new Date()}
+        selected={selectedDate ?? undefined}
         onSelect={() => {}}
         onMonthChange={handleMonthChange}
         showOutsideDays={false}
@@ -117,164 +138,136 @@ const SidebarCalendar = ({ activities }: { activities?: Activity[] }) => {
         className="w-full border-0 p-0 bg-transparent text-sm"
         modifiers={{
           green: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "green" &&
-                isInRange(
-                  d,
-                  new Date(activity.start_date),
-                  new Date(activity.end_date)
-                )
+                activity.color === "green" &&
+                isInRangeKey(dayKey(d), activity.startKey, activity.endKey)
             ),
           greenStart: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "green" &&
-                isSameDay(d, new Date(activity.start_date))
+                activity.color === "green" &&
+                isSameDayKey(dayKey(d), activity.startKey)
             ),
           greenEnd: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "green" &&
-                isSameDay(d, new Date(activity.end_date))
+                activity.color === "green" &&
+                isSameDayKey(dayKey(d), activity.endKey)
             ),
 
           blue: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "blue" &&
-                isInRange(
-                  d,
-                  new Date(activity.start_date),
-                  new Date(activity.end_date)
-                )
+                activity.color === "blue" &&
+                isInRangeKey(dayKey(d), activity.startKey, activity.endKey)
             ),
           blueStart: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "blue" &&
-                isSameDay(d, new Date(activity.start_date))
+                activity.color === "blue" &&
+                isSameDayKey(dayKey(d), activity.startKey)
             ),
           blueEnd: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "blue" &&
-                isSameDay(d, new Date(activity.end_date))
+                activity.color === "blue" &&
+                isSameDayKey(dayKey(d), activity.endKey)
             ),
 
           red: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "red" &&
-                isInRange(
-                  d,
-                  new Date(activity.start_date),
-                  new Date(activity.end_date)
-                )
+                activity.color === "red" &&
+                isInRangeKey(dayKey(d), activity.startKey, activity.endKey)
             ),
           redStart: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "red" &&
-                isSameDay(d, new Date(activity.start_date))
+                activity.color === "red" &&
+                isSameDayKey(dayKey(d), activity.startKey)
             ),
           redEnd: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "red" &&
-                isSameDay(d, new Date(activity.end_date))
+                activity.color === "red" &&
+                isSameDayKey(dayKey(d), activity.endKey)
             ),
 
           yellow: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "yellow" &&
-                isInRange(
-                  d,
-                  new Date(activity.start_date),
-                  new Date(activity.end_date)
-                )
+                activity.color === "yellow" &&
+                isInRangeKey(dayKey(d), activity.startKey, activity.endKey)
             ),
           yellowStart: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "yellow" &&
-                isSameDay(d, new Date(activity.start_date))
+                activity.color === "yellow" &&
+                isSameDayKey(dayKey(d), activity.startKey)
             ),
           yellowEnd: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "yellow" &&
-                isSameDay(d, new Date(activity.end_date))
+                activity.color === "yellow" &&
+                isSameDayKey(dayKey(d), activity.endKey)
             ),
 
           purple: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "purple" &&
-                isInRange(
-                  d,
-                  new Date(activity.start_date),
-                  new Date(activity.end_date)
-                )
+                activity.color === "purple" &&
+                isInRangeKey(dayKey(d), activity.startKey, activity.endKey)
             ),
           purpleStart: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "purple" &&
-                isSameDay(d, new Date(activity.start_date))
+                activity.color === "purple" &&
+                isSameDayKey(dayKey(d), activity.startKey)
             ),
           purpleEnd: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "purple" &&
-                isSameDay(d, new Date(activity.end_date))
+                activity.color === "purple" &&
+                isSameDayKey(dayKey(d), activity.endKey)
             ),
 
           pink: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "pink" &&
-                isInRange(
-                  d,
-                  new Date(activity.start_date),
-                  new Date(activity.end_date)
-                )
+                activity.color === "pink" &&
+                isInRangeKey(dayKey(d), activity.startKey, activity.endKey)
             ),
           pinkStart: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "pink" &&
-                isSameDay(d, new Date(activity.start_date))
+                activity.color === "pink" &&
+                isSameDayKey(dayKey(d), activity.startKey)
             ),
           pinkEnd: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "pink" &&
-                isSameDay(d, new Date(activity.end_date))
+                activity.color === "pink" &&
+                isSameDayKey(dayKey(d), activity.endKey)
             ),
 
           indigo: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "indigo" &&
-                isInRange(
-                  d,
-                  new Date(activity.start_date),
-                  new Date(activity.end_date)
-                )
+                activity.color === "indigo" &&
+                isInRangeKey(dayKey(d), activity.startKey, activity.endKey)
             ),
           indigoStart: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "indigo" &&
-                isSameDay(d, new Date(activity.start_date))
+                activity.color === "indigo" &&
+                isSameDayKey(dayKey(d), activity.startKey)
             ),
           indigoEnd: (d) =>
-            safeActivities.some(
+            parsedActivities.some(
               (activity) =>
-                colorByType(activity.type) === "indigo" &&
-                isSameDay(d, new Date(activity.end_date))
+                activity.color === "indigo" &&
+                isSameDayKey(dayKey(d), activity.endKey)
             ),
         }}
         modifiersClassNames={{

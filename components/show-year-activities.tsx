@@ -105,9 +105,9 @@ export { colorStyles };
 const termLabels = ["Pre-term", "Fall", "Spring", "Summer"];
 
 function formatDateRange(start: string, end: string) {
-  return `${new Date(start).toLocaleDateString()} - ${new Date(
-    end
-  ).toLocaleDateString()}`;
+  const formatStableDate = (value: string) =>
+    new Date(value).toISOString().slice(0, 10);
+  return `${formatStableDate(start)} - ${formatStableDate(end)}`;
 }
 
 const YearActivities = ({ activities }: { activities?: Activity[] }) => {
@@ -115,12 +115,25 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
   const typeLegend = Array.from(new Set(safeActivities.map((a) => a.type)));
 
   const [showActivities, setShowActivities] = useState<string[]>(typeLegend);
+  const [device, setDevice] = useState<
+    "mobile" | "tablet" | "desktop" | "other"
+  >("desktop");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   // useEffect(() => {
   //   // Your effect logic here
   // }, [showActivities, setShowActivities]);
 
-  const device = DeviceDetection();
+  useEffect(() => {
+    const updateDevice = () => setDevice(DeviceDetection());
+    updateDevice();
+    window.addEventListener("resize", updateDevice);
+    return () => window.removeEventListener("resize", updateDevice);
+  }, []);
+
+  useEffect(() => {
+    setSelectedDate(new Date());
+  }, []);
 
   // const activitiesByTerms = termLabels.map((term) =>
   //   activities.filter((activity) => activity.term === term)
@@ -185,7 +198,7 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
             captionLayout="label"
             weekStartsOn={1}
             mode="single"
-            selected={new Date()}
+            selected={selectedDate ?? undefined}
             showOutsideDays={false}
             onSelect={() => {}}
             modifiers={{
@@ -540,9 +553,8 @@ export function DeviceDetection():
   | "mobile"
   | "tablet"
   | "desktop"
-  | "other"
-  | null {
-  if (typeof window === "undefined") return null;
+  | "other" {
+  if (typeof window === "undefined") return "desktop";
 
   const width = window.innerWidth;
 

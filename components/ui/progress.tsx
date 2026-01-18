@@ -58,7 +58,7 @@ function Progress({
   weekSessions,
   ...props
 }: ProgressProps) {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   useEffect(() => {
     // Set an interval to update the time every second
@@ -78,6 +78,14 @@ function Progress({
   //     })
   //   ) || 0
   // );
+
+  const currentTimeTitle = currentTime
+    ? "Current time " +
+      currentTime.toLocaleTimeString("ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : undefined;
 
   return (
     <ProgressPrimitive.Root
@@ -282,13 +290,7 @@ function Progress({
           data-slot="progress-indicator"
           className="animate-pulse duration-1500 absolute top-0 h-full w-1 bg-red-500 shadow-red-500 transition-all z-20"
           style={{ left: `calc(${proportionalValue}% - 2px)` }}
-          title={
-            "Current time " +
-            currentTime.toLocaleTimeString("ru-RU", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })
-          }
+          title={currentTimeTitle}
         />
       )}
     </ProgressPrimitive.Root>

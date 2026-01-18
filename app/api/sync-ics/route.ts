@@ -33,7 +33,14 @@ export async function POST(req: Request) {
   }
 
   // 3) Fetch ICS file
-  const res = await fetch(icsUrl);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  let res: Response;
+  try {
+    res = await fetch(icsUrl, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
   if (!res.ok) {
     return NextResponse.json({ error: 'Failed to fetch ICS file' }, { status: 400 });
   }
@@ -49,11 +56,10 @@ export async function POST(req: Request) {
   
   // 5) Map to deadlines rows
   const rows = events
-    .filter((ev) => !!!ev.SUMMARY?.toLocaleLowerCase().includes('attendance')) // Skip events with 'Attendance' in the title
+    .filter((ev) => !!!ev.SUMMARY?.toLowerCase().includes('attendance')) // Skip events with 'Attendance' in the title
     .map((ev) => {
       const categories = ev.CATEGORIES ?? '';
       const [subject, lecturer] = categories.split('|').map((s) => s.trim());
-      console.log(ev.SUMMARY);
       
       const title = ev.SUMMARY ?? 'Untitled';
       const eventType = detectEventType(title);

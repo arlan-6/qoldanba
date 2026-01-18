@@ -160,14 +160,14 @@ export async function AppSidebar({
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
+                {/* <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Links">
                     <Link href="/my/links">
                       <LinkIcon />
                       <span>Links</span>
                     </Link>
                   </SidebarMenuButton>
-                </SidebarMenuItem>
+                </SidebarMenuItem> */}
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Academic year">
                     <Link href="/my/academic-year">
