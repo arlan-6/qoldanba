@@ -25,7 +25,7 @@ const DeadlinesFilters = ({
   showDeadlines,
 }: DeadlinesFiltersProps) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="hidden md:flex items-center gap-2">
       <ToggleGroup
         defaultValue={["assignment", "quiz", "deadline", "exam"]}
         type="multiple"

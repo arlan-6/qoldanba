@@ -42,7 +42,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
       <div className="flex flex-wrap items-center justify-between mb-4">
         <DeadlinesHeader count={filteredDeadlines.length} />
 
-        <div className="flex items-center gap-2 pt-4">
+        <div className="flex flex-wrap items-center gap-2 pt-4">
           <ViewTypeToggle viewType={viewType} setViewType={setViewType} />
           <DeadlinesFilters
             onFilterChange={onFilterChange}
