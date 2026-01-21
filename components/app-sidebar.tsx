@@ -24,6 +24,7 @@ import {
 import Link from "next/link";
 import { headers } from "next/headers";
 import SidebarCalendar, { Activity } from "./sidebar-calendar";
+import { ScrollArea } from "./ui/scroll-area";
 
 export async function AppSidebar({
   ...props
@@ -153,6 +154,7 @@ export async function AppSidebar({
               </SidebarMenu>
               <SidebarGroupLabel>Menu</SidebarGroupLabel>
               <SidebarMenu>
+                <ScrollArea className="h-[400px] w-full">
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Dashboard">
                     <Link href="/my">
@@ -198,6 +200,7 @@ export async function AppSidebar({
                 <SidebarMenuItem>
                   <SidebarCalendar activities={activitiesList as Activity[]} />
                 </SidebarMenuItem>
+                </ScrollArea>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
