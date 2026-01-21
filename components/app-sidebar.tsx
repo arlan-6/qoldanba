@@ -19,6 +19,7 @@ import {
   Users,
   MailQuestion,
   Link as LinkIcon,
+  MapIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { headers } from "next/headers";
@@ -96,7 +97,7 @@ export async function AppSidebar({
     if (metadata.degreeProgram) {
       activitiesQuery = activitiesQuery.eq(
         "program_level",
-        metadata.degreeProgram
+        metadata.degreeProgram,
       );
     }
 
@@ -160,14 +161,32 @@ export async function AppSidebar({
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                {/* <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Links">
-                    <Link href="/my/links">
-                      <LinkIcon />
-                      <span>Links</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem> */}
+                <div className="flex w-full">
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      className="flex-1 w-full"
+                      asChild
+                      tooltip="Links"
+                    >
+                      <Link href="/my/links">
+                        <LinkIcon />
+                        <span>Links</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      className="flex-1 w-full"
+                      asChild
+                      tooltip="Links"
+                    >
+                      <Link href="/my/aitumap">
+                        <MapIcon />
+                        <span>Map</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </div>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Academic year">
                     <Link href="/my/academic-year">
