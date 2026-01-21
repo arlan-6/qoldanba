@@ -21,7 +21,8 @@ const MinimapLayout = ({ children }) => {
   const { funMode } = useContext(MapContext);
 
   const dropShadow = funMode
-    ? "drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))"
+       ? "drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(-2px 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(2px -2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(-2px -2px 4px rgba(0, 0, 0, 0.5))"
+
     : "";
 
   return (

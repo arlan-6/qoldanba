@@ -23,8 +23,9 @@ const MapLayout = ({ children }) => {
   const { funMode } = useContext(MapContext);
 
   const dropShadow = funMode
-    ? "drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5))"
-    : "";
+    // ? "drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(-2px 2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(2px -2px 4px rgba(0, 0, 0, 0.5)) drop-shadow(-2px -2px 4px rgba(0, 0, 0, 0.5))"
+    // : 
+    " ";
 
   return (
     <TransformWrapper  minScale={0.9} defaultScale={1}>
@@ -32,7 +33,7 @@ const MapLayout = ({ children }) => {
         <svg
           // width={width}
           // height={height}
-          className="h-[calc(100vh-4rem)] w-[calc(100vw-4rem)] p-24"
+          className="h-[calc(100vh-4rem)] w-full md:w-[calc(100vw-4rem)] p-24"
           xmlns={"http://www.w3.org/2000/svg"}
           viewBox={"0 0 924.69 396.16"}
         >

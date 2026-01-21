@@ -24,7 +24,7 @@ const Search = () => {
     }
   }, [query]);
   return (
-    <div className="absolute z-20 ml-3 mt-2 flex justify-center flex-wrap">
+    <div className="absolute z-20 ml-3 mt-2 flex justify-center flex-wrap ">
       <select
         value={selectedBlockOption}
         onChange={handleBlockOptionChange}
@@ -54,7 +54,7 @@ const Search = () => {
         />
         <SearchIcon className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       </div>
-      <div className="ml-3  text-sm  bg-accent p-2 px-4 rounded-md">
+      <div className="ml-3 mt-2 sm:mt-0 text-sm  bg-accent p-2 px-4 rounded-md">
         <p>
           Map created by <a href="https://github.com/Yuujiso/aitumap" className="underline">Yuujiso</a>
         </p>

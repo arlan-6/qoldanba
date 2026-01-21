@@ -203,7 +203,7 @@ export async function AppSidebar({
           </SidebarGroup>
 
           <div className="mt-auto p-2">
-            <SidebarGroupLabel>Support</SidebarGroupLabel>
+            {/* <SidebarGroupLabel>Support</SidebarGroupLabel> */}
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Questions?">
                 <Link href="https://t.me/ArLaN_XD" target="_blank">
