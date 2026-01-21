@@ -38,7 +38,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
   });
 
   return (
-    <div className="p-6">
+    <div className="p-6 pt-2">
       <div className="flex flex-wrap items-center justify-between mb-4">
         <DeadlinesHeader count={filteredDeadlines.length} />
 

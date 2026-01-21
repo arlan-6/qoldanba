@@ -209,7 +209,7 @@ export const Schedule: FC<ScheduleProps> = ({
   }
 
   return (
-    <div className={cn("space-y-8 m-6 lg:m-10 ", className)}>
+    <div className={cn("space-y-8 m-6 mb-0  lg:m-10 lg:mb-0", className)}>
       <h1 className="text-xl mb-4 font-bold">Schedule</h1>
       <Tabs defaultValue="today">
         <TabsList className="w-full flex items-center justify-between pr-2">
@@ -334,6 +334,7 @@ export const Schedule: FC<ScheduleProps> = ({
                 value={0}
                 sessions={tomorrowSessions}
                 className="w-full bg-white "
+                isTomorrow={true}
               />
               <SessionsList
                 sessions={tomorrowSessions}

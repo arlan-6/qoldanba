@@ -58,6 +58,229 @@ interface ProgressProps extends React.ComponentPropsWithoutRef<
   isTomorrow?: boolean;
 }
 
+function SessionIndicatorCard({
+  session,
+  index,
+  sessions,
+  proportionalValue,
+  isTomorrowCard = false,
+}: {
+  session: Session;
+  index: number;
+  sessions: Session[];
+  proportionalValue: number;
+  isTomorrowCard: boolean;
+}) {
+  const [startTimeStr, endTimeStr] = session.time.split("-");
+  const startPercent = convertToProportionalProgress(
+    timeStringToPercent(startTimeStr),
+  );
+  const endPercent = convertToProportionalProgress(
+    timeStringToPercent(endTimeStr),
+  );
+
+  const currentPercent = proportionalValue;
+  let status: "passed" | "current" | "upcoming" | "online" = "upcoming";
+
+  if (currentPercent > endPercent) {
+    status = "passed";
+  } else if (currentPercent >= startPercent && currentPercent <= endPercent) {
+    status = "current";
+  }
+  if (session.classroom === "Online") {
+    status = "online";
+  }
+  if (isTomorrowCard) {
+    status = "upcoming";
+  }
+
+  return (
+    <HoverCard key={index} openDelay={50} closeDelay={50}>
+      <HoverCardTrigger onClick={(e) => e.stopPropagation()} asChild>
+        <ProgressPrimitive.Indicator
+          data-slot="progress-indicator"
+          className={cn(
+            "absolute my-0.5 h-2 w-20 transition-all duration-200 cursor-pointer rounded-sm",
+            " hover:shadow-lg  first:ml-0.5",
+            "w-[6.9%]",
+            status === "passed" &&
+              "bg-muted-foreground/80   hover:grayscale-0 hover:opacity-100",
+            status === "current" && "ring-2 ring-offset-1  z-10  ",
+            status !== "passed" &&
+              (session.classroom === "online"
+                ? "bg-secondary hover:bg-secondary/80"
+                : session.type === "lecture"
+                  ? "bg-primary hover:bg-primary/80"
+                  : "bg-primary hover:bg-primary/50"),
+            // has2SessionAfter && "after:content-[''] after:absolute after:left-full after:top-0 after:h-full after:w-[40%] after:bg-secondary/70  after:rounded-sm after:z-0"
+          )}
+          style={{
+            left: `calc(${startPercent}% - 0px)`,
+          }}
+        />
+      </HoverCardTrigger>
+      <HoverCardContent
+        className="max-w-sm p-4 text-white backdrop-blur-md border border-primary/40 shadow-md shadow-primary/20"
+        style={{ backgroundColor: "oklch(0.18 0.005 53.043 / 0.7)" }}
+      >
+        <div className="space-y-2.5">
+          <div className="border-b border-primary/40 pb-2">
+            <h3 className="font-bold text-base leading-tight flex items-center gap-2 text-primary">
+              <BookOpen className="w-4 h-4" />
+              {session.discipline}
+            </h3>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">
+                {session.time}
+              </span>
+            </div>
+            <span
+              className={cn(
+                "px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide",
+                "bg-primary/20 text-primary border border-primary/40",
+              )}
+            >
+              {session.type}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-sm text-foreground">
+              {session.classroom}
+            </span>
+          </div>
+          <div className="flex items-start gap-1.5 pt-1 border-t border-muted/50">
+            <User className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+            <span className="text-xs text-muted-foreground leading-relaxed">
+              {session.lecturer.length > 2
+                ? `${session.lecturer.slice(0, 2).join(", ")} +${
+                    session.lecturer.length - 2
+                  } more`
+                : session.lecturer.join(", ")}
+            </span>
+          </div>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+function WeekSessionsIndicators({
+  weekSessions,
+}: {
+  weekSessions: Session[][];
+}) {
+  return (
+    <>
+      {weekSessions.map((daySessions, index) => {
+        return (
+          <div key={index}>
+            {daySessions.map((session, i) => {
+              const startPercent = convertToProportionalProgress(
+                timeStringToPercent(session.time.split("-")[0]),
+              );
+
+              return (
+                <div key={i}>
+                  <ProgressPrimitive.Indicator
+                    children={
+                      <span className="text-xs px-2 line-clamp-1">
+                        {session.discipline}
+                      </span>
+                    }
+                    data-slot="progress-indicator"
+                    className={cn(
+                      "absolute my-0.5 h-4 w-20 transition-all duration-200 cursor-pointer rounded-xl",
+                      "hover:scale-105 hover:shadow-lg hover:z-20 line-clamp-1",
+                      "w-[5.8%] bg-blue-500",
+                    )}
+                    style={{
+                      left: `calc( ${startPercent}% - 0px)`,
+                      top: `calc(${(index * 100) / 6}% )`,
+                    }}
+                  />
+                </div>
+              );
+            })}
+            <ProgressPrimitive.Indicator
+              children={
+                <span className="text-xs px-2 line-clamp-1">
+                  {
+                    [
+                      "Monday",
+                      "Tuesday",
+                      "Wednesday",
+                      "Thursday",
+                      "Friday",
+                      "Saturday",
+                      "Sunday",
+                    ][index]
+                  }
+                </span>
+              }
+              data-slot="progress-indicator"
+              className={cn(
+                "absolute my-0.5 h-4 w-20 sm:24 lg:w-32  transition-all duration-200 cursor-pointer rounded-xl",
+                "hover:scale-105 hover:shadow-lg hover:z-20 line-clamp-1",
+                "bg-blue-500",
+              )}
+              style={{
+                left: `2px`,
+                top: `calc(${(index * 100) / 6}% )`,
+              }}
+            />
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function CurrentTimeIndicator({
+  proportionalValue,
+  currentTimeTitle,
+  currentTimeString,
+}: {
+  proportionalValue: number;
+  currentTimeTitle?: string;
+  currentTimeString?: string;
+}) {
+  if (proportionalValue <= 0 || proportionalValue >= 100) {
+    return null;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <ProgressPrimitive.Indicator
+          data-slot="progress-indicator"
+          className={cn(
+            "absolute top-0 h-full w-[3px] rounded-full z-30 transition-all",
+            "bg-gradient-to-b from-red-400 via-red-500 to-red-600",
+            "shadow-[0_0_10px_rgba(239,68,68,0.75)]",
+            "animate-pulse",
+            "hover:w-[5px] hover:shadow-[0_0_16px_rgba(239,68,68,0.95)]",
+          )}
+          style={{ left: `calc(${proportionalValue}% - 2px)` }}
+          title={currentTimeTitle}
+        >
+          <span className="absolute -top-2 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.9)]" />
+        </ProgressPrimitive.Indicator>
+      </TooltipTrigger>
+      <TooltipContent className="border p-2 bg-accent rounded">
+        <p>
+          {currentTimeString
+            ? `Current time ${currentTimeString}`
+            : "Current time"}
+        </p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 function Progress({
   className,
   value,
@@ -135,231 +358,26 @@ function Progress({
         )}
         {...props}
       >
-        {sessions?.map((session, index) => {
-          // Extract times
-          const [startTimeStr, endTimeStr] = session.time.split("-");
-          const startPercent = convertToProportionalProgress(
-            timeStringToPercent(startTimeStr),
-          );
-          const endPercent = convertToProportionalProgress(
-            timeStringToPercent(endTimeStr),
-          );
+        {sessions?.map((session, index) => (
+          <SessionIndicatorCard
+            key={index}
+            session={session}
+            index={index}
+            sessions={sessions}
+            proportionalValue={proportionalValue}
+            isTomorrowCard={isTomorrow}
+          />
+        ))}
 
-          // Current time position (value is passed from parent Progress component)
-          const currentPercent = proportionalValue; // value is already converted in the component body
-
-          let status: "passed" | "current" | "upcoming" | "online" = "upcoming";
-
-          if (currentPercent > endPercent) {
-            status = "passed";
-          } else if (
-            currentPercent >= startPercent &&
-            currentPercent <= endPercent
-          ) {
-            status = "current";
-          }
-          if (session.classroom === "Online") {
-            status = "online";
-          }
-          // status='upcoming'
-
-          const has2SessionAfter =
-            session.classroom == sessions[index + 1]?.classroom;
-
-          return (
-            <HoverCard key={index} openDelay={50} closeDelay={50}>
-              <HoverCardTrigger onClick={(e) => e.stopPropagation()} asChild>
-                <ProgressPrimitive.Indicator
-                  data-slot="progress-indicator"
-                  className={cn(
-                    // Base styling for the time slot indicator
-                    "absolute my-0.5 h-2 w-20 transition-all duration-200 cursor-pointer rounded-sm",
-                    " hover:shadow-lg  first:ml-0.5",
-                    "w-[6.9%]", // Assuming width calculation is correct
-
-                    // Passed sessions: Muted, low-opacity look
-                    status === "passed" &&
-                      "bg-muted-foreground/80   hover:grayscale-0 hover:opacity-100", // Using muted-foreground for contrast
-
-                    // Current session: Pulsing ring using the theme's primary accent
-                    status === "current" && "ring-2 ring-offset-1  z-10  ",
-
-                    // Session type-based coloring (used for upcoming/online/current)
-                    status !== "passed" &&
-                      (session.classroom === "online"
-                        ? "bg-secondary hover:bg-secondary/80" // Use secondary for online/remote
-                        : session.type === "lecture"
-                          ? "bg-primary hover:bg-primary/80" // Use primary for lectures (important)
-                          : "bg-primary hover:bg-primary/50"), // A slightly softer primary for other types,
-
-                    // has2SessionAfter && "after:content-[''] after:absolute after:left-full after:top-0 after:h-full after:w-[40%] after:bg-secondary/70  after:rounded-sm after:z-0"
-                  )}
-                  style={{
-                    left: `calc(${startPercent}% - 0px)`,
-                  }}
-                />
-              </HoverCardTrigger>
-              {/* [Theme Change: HoverCard Content] Apply dark, glossy look using theme colors */}
-              <HoverCardContent
-                className="max-w-sm p-4 text-white backdrop-blur-md border border-primary/40 shadow-md shadow-primary/20"
-                // Using bg-card and text-foreground directly. If text-white is needed
-                // for high contrast against bg-card in dark mode, keep it, but
-                // using bg-card/70 for that glass look is better:
-                style={{ backgroundColor: "oklch(0.18 0.005 53.043 / 0.7)" }}
-              >
-                <div className="space-y-2.5">
-                  {/* Discipline - Main heading */}
-                  <div className="border-b border-primary/40 pb-2">
-                    {" "}
-                    {/* Used primary for separator */}
-                    <h3 className="font-bold text-base leading-tight flex items-center gap-2 text-primary">
-                      {" "}
-                      {/* Used primary for icon and text */}
-                      <BookOpen className="w-4 h-4" />
-                      {session.discipline}
-                    </h3>
-                  </div>
-
-                  {/* Time and Type row */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-muted-foreground" />{" "}
-                      {/* Used muted for subtle icons */}
-                      <span className="text-sm font-medium text-foreground">
-                        {session.time}
-                      </span>
-                    </div>
-                    <span
-                      className={cn(
-                        "px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide",
-                        // Type-specific colors using theme variables
-                        // session.type === "lecture"
-                        "bg-primary/20 text-primary border border-primary/40", // Primary for Lectures
-                        // : "bg-secondary/20 text-secondary border border-secondary/40" // Secondary for Labs/Seminars
-                      )}
-                    >
-                      {session.type}
-                    </span>
-                  </div>
-
-                  {/* Classroom */}
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span className="text-sm text-foreground">
-                      {session.classroom}
-                    </span>
-                  </div>
-
-                  {/* Lecturer */}
-                  <div className="flex items-start gap-1.5 pt-1 border-t border-muted/50">
-                    {" "}
-                    {/* Used muted for subtle separator */}
-                    <User className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
-                    <span className="text-xs text-muted-foreground leading-relaxed">
-                      {" "}
-                      {/* Used muted for secondary info text */}
-                      {session.lecturer.length > 2
-                        ? `${session.lecturer.slice(0, 2).join(", ")} +${
-                            session.lecturer.length - 2
-                          } more`
-                        : session.lecturer.join(", ")}
-                    </span>
-                  </div>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
-          );
-        })}
-
-        {weekSessions?.map((daySessions, index) => {
-          return (
-            <div key={index}>
-              {daySessions.map((session, i) => {
-                const startPercent = convertToProportionalProgress(
-                  timeStringToPercent(session.time.split("-")[0]),
-                );
-
-                return (
-                  <div key={i}>
-                    <ProgressPrimitive.Indicator
-                      children={
-                        <span className="text-xs px-2 line-clamp-1">
-                          {session.discipline}
-                        </span>
-                      }
-                      data-slot="progress-indicator"
-                      className={cn(
-                        "absolute my-0.5 h-4 w-20 transition-all duration-200 cursor-pointer rounded-xl",
-                        "hover:scale-105 hover:shadow-lg hover:z-20 line-clamp-1",
-                        "w-[5.8%] bg-blue-500",
-                      )}
-                      style={{
-                        left: `calc( ${startPercent}% - 0px)`,
-                        top: `calc(${(index * 100) / 6}% )`,
-                      }}
-                    />
-                  </div>
-                );
-              })}
-              <ProgressPrimitive.Indicator
-                children={
-                  <span className="text-xs px-2 line-clamp-1">
-                    {
-                      [
-                        "Monday",
-                        "Tuesday",
-                        "Wednesday",
-                        "Thursday",
-                        "Friday",
-                        "Saturday",
-                        "Sunday",
-                      ][index]
-                    }
-                  </span>
-                }
-                data-slot="progress-indicator"
-                className={cn(
-                  "absolute my-0.5 h-4 w-20 sm:24 lg:w-32  transition-all duration-200 cursor-pointer rounded-xl",
-                  "hover:scale-105 hover:shadow-lg hover:z-20 line-clamp-1",
-                  "bg-blue-500",
-                )}
-                style={{
-                  left: `2px`,
-                  top: `calc(${(index * 100) / 6}% )`,
-                }}
-              />
-            </div>
-          );
-        })}
-
-        {/* Main indicator - invisible but creates the border */}
-        {proportionalValue > 0 && proportionalValue < 100 && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <ProgressPrimitive.Indicator
-                data-slot="progress-indicator"
-                className={cn(
-                  "absolute top-0 h-full w-[3px] rounded-full z-30 transition-all",
-                  "bg-gradient-to-b from-red-400 via-red-500 to-red-600",
-                  "shadow-[0_0_10px_rgba(239,68,68,0.75)]",
-                  "animate-pulse",
-                  "hover:w-[5px] hover:shadow-[0_0_16px_rgba(239,68,68,0.95)]",
-                )}
-                style={{ left: `calc(${proportionalValue}% - 2px)` }}
-                title={currentTimeTitle}
-              >
-                <span className="absolute -top-2 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.9)]" />
-              </ProgressPrimitive.Indicator>
-            </TooltipTrigger>
-            <TooltipContent className="border p-2 bg-accent rounded">
-              <p>
-                {currentTimeString
-                  ? `Current time ${currentTimeString}`
-                  : "Current time"}
-              </p>
-            </TooltipContent>
-          </Tooltip>
+        {weekSessions && (
+          <WeekSessionsIndicators weekSessions={weekSessions} />
         )}
+
+        <CurrentTimeIndicator
+          proportionalValue={proportionalValue}
+          currentTimeTitle={currentTimeTitle}
+          currentTimeString={currentTimeString}
+        />
       </ProgressPrimitive.Root>
     </>
   );
