@@ -62,3 +62,21 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
+
+self.addEventListener("push", (event) => {
+  const data = event.data?.json?.() || {};
+  const title = data.title || "Qoldanba";
+  const options = {
+    body: data.body || "New update",
+    icon: "/icon-192.png",
+    badge: "/icon-192.png",
+    data: data.url || "/my",
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data || "/my";
+  event.waitUntil(self.clients.openWindow(url));
+});

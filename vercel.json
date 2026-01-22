@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/class-reminders",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/deadline-reminders",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
