@@ -87,7 +87,7 @@ export function PushNotifications() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: "Qoldanba",
+          title: "Qoldanba | Test",
           body: "Test notification",
           url: "/my",
         }),
