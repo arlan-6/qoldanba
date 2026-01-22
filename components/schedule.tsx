@@ -83,11 +83,21 @@ export const Schedule: FC<ScheduleProps> = ({
   initialData,
 }) => {
   const supabase = useMemo(() => createClient(), []);
+  const scheduleCacheKey = group
+    ? `qoldanba:schedule:${group.toUpperCase()}`
+    : null;
   const [weekSchedule, setWeekSchedule] = useState<WeekSchedule | null>(
     initialData || null
   );
   const [isLoading, setIsLoading] = useState(!initialData && !!group);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!scheduleCacheKey || !initialData) return;
+    try {
+      localStorage.setItem(scheduleCacheKey, JSON.stringify(initialData));
+    } catch {}
+  }, [initialData, scheduleCacheKey]);
 
   useEffect(() => {
     // If we have initial data, we don't need to fetch
@@ -106,6 +116,16 @@ export const Schedule: FC<ScheduleProps> = ({
     setIsLoading(true);
     setError(null);
 
+    const loadCachedSchedule = () => {
+      if (!scheduleCacheKey) return null;
+      try {
+        const raw = localStorage.getItem(scheduleCacheKey);
+        return raw ? (JSON.parse(raw) as WeekSchedule) : null;
+      } catch {
+        return null;
+      }
+    };
+
     const fetchSchedule = async () => {
       try {
         const { data, error } = await supabase
@@ -118,8 +138,13 @@ export const Schedule: FC<ScheduleProps> = ({
 
         if (error) {
           console.error("Error fetching schedule:", error);
-          setError("Unable to load schedule");
-          setWeekSchedule(null);
+          const cached = loadCachedSchedule();
+          if (cached) {
+            setWeekSchedule(cached);
+          } else {
+            setError("Unable to load schedule");
+            setWeekSchedule(null);
+          }
           return;
         }
 
@@ -131,14 +156,28 @@ export const Schedule: FC<ScheduleProps> = ({
             }
           });
           setWeekSchedule(sortedSchedule);
+          if (scheduleCacheKey) {
+            try {
+              localStorage.setItem(
+                scheduleCacheKey,
+                JSON.stringify(sortedSchedule)
+              );
+            } catch {}
+          }
         } else {
           setWeekSchedule(null);
         }
       } catch (err) {
         if (!active) return;
         console.error("Unexpected error:", err);
-        setError("Unable to load schedule");
-        setWeekSchedule(null);
+        const cached = loadCachedSchedule();
+        if (cached) {
+          setWeekSchedule(cached);
+          setError(null);
+        } else {
+          setError("Unable to load schedule");
+          setWeekSchedule(null);
+        }
       } finally {
         if (active) {
           setIsLoading(false);

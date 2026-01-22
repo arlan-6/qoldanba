@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
+import { ServiceWorkerRegister } from "./_components/ServiceWorkerRegister";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -15,8 +16,10 @@ export const metadata: Metadata = {
     default: "Qoldanba",
     template: "%s | Qoldanba",
   },
+  applicationName: "Qoldanba",
   description:
     "Check your deadlines and schedule. Centralize your university life with Qoldanba.",
+  manifest: "/manifest.webmanifest",
   keywords: [
     "university",
     "schedule",
@@ -33,6 +36,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
   twitter: {
     card: "summary_large_image",
@@ -40,6 +44,18 @@ export const metadata: Metadata = {
     description: "Check your deadlines and schedule.",
     creator: "@arlan-6",
   },
+  appleWebApp: {
+    capable: true,
+    title: "Qoldanba",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#14181c" },
+  ],
 };
 
 const geistSans = Geist({
@@ -64,6 +80,7 @@ export default function RootLayout({
         )}
       </head>
       <body className={`${geistSans.className} antialiased`}>
+          <ServiceWorkerRegister />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

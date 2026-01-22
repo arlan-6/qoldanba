@@ -7,14 +7,39 @@ import ViewTypeToggle from "./deadlines/view-type-toggle";
 import DeadlinesFilters from "./deadlines/deadlines-filters";
 import { motion } from "motion/react";
 
+const STORAGE_KEY = "qoldanba:deadlines:last-viewed";
+
 const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
   const [showExams, setShowExams] = React.useState(true);
   const [showAssignments, setShowAssignments] = React.useState(true);
   const [showQuizzes, setShowQuizzes] = React.useState(true);
   const [showDeadlines, setShowDeadlines] = React.useState(true);
   const [viewType, setViewType] = React.useState<"list" | "card">("card");
+  const [cachedDeadlines, setCachedDeadlines] = React.useState<any[] | null>(
+    null
+  );
 
-  if (!deadlines || deadlines.length === 0) {
+  React.useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        setCachedDeadlines(JSON.parse(raw));
+      }
+    } catch {}
+  }, []);
+
+  React.useEffect(() => {
+    if (!deadlines || deadlines.length === 0) return;
+    setCachedDeadlines(deadlines);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(deadlines));
+    } catch {}
+  }, [deadlines]);
+
+  const effectiveDeadlines =
+    deadlines && deadlines.length > 0 ? deadlines : cachedDeadlines || [];
+
+  if (!effectiveDeadlines || effectiveDeadlines.length === 0) {
     return (
       <div className="p-6 text-center text-muted-foreground">
         No deadlines found.
@@ -29,7 +54,7 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
     setShowDeadlines(value.includes("deadline"));
   };
 
-  const filteredDeadlines = deadlines.filter((deadline) => {
+  const filteredDeadlines = effectiveDeadlines.filter((deadline) => {
     if (deadline.event_type === "exam" && !showExams) return false;
     if (deadline.event_type === "homework" && !showAssignments) return false;
     if (deadline.event_type === "quiz" && !showQuizzes) return false;
