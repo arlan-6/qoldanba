@@ -1,7 +1,7 @@
 {
   "name": "Qoldanba",
   "short_name": "Qoldanba",
-  "start_url": "/",
+  "start_url": "/my",
   "display": "standalone",
   "background_color": "#14181c",
   "theme_color": "#14181c",
