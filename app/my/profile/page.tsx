@@ -26,6 +26,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { LogoutButton } from "@/components/logout-button";
 
 const ProfilePage = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -123,7 +124,7 @@ const ProfilePage = () => {
                 </Badge>
               </div>
 
-              <div className="mt-8 grid grid-cols-2 gap-4 w-full">
+              {/* <div className="mt-8 grid grid-cols-2 gap-4 w-full">
                 <div className="flex flex-col items-center p-3 rounded-xl bg-background/50 border border-border/50">
                   <span className="text-xs text-muted-foreground">Joined</span>
                   <span className="text-sm font-medium">
@@ -136,7 +137,7 @@ const ProfilePage = () => {
                     Active
                   </span>
                 </div>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
 
@@ -227,7 +228,9 @@ const ProfilePage = () => {
                     </a>
                   </Button>
                 )}
-              </CardFooter>
+
+                
+              </CardFooter><LogoutButton/>
             </Card>
           </div>
         </div>

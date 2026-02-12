@@ -24,9 +24,8 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center bg-background">
+    <main className="min-h-screen pb-4 md:pb-0 flex flex-col items-center bg-background ">
       <div className="flex-1 w-full flex flex-col items-center">
-        {/* Navigation wrapped in Suspense (as requested) */}
         <Suspense
           fallback={
             <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16 bg-background/80 backdrop-blur-md sticky top-0 z-50" />
@@ -36,7 +35,6 @@ export default function Home() {
         </Suspense>
 
         <div className="w-full flex-1">
-          {/* The Animated Client Component */}
           <LandingPage />
         </div>
       </div>

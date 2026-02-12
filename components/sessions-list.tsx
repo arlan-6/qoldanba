@@ -107,7 +107,7 @@ const SessionsList = ({
                   </div>
 
                   {/* Classroom */}
-                    <Link target="blank" href={`/my/aitumap?room=${session.classroom}`}>
+                    <Link href={`/my/aitumap?room=${session.classroom}`}>
                   <div className="flex items-center gap-2 mb-2 underline underline-offset-2 underline-primary">
                     
                     <MapPin className="w-4 h-4 text-muted-foreground" />

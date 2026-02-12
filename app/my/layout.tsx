@@ -25,7 +25,7 @@ export default async function ProtectedLayout({
   return (
     
     <SidebarProvider defaultOpen={false}>
-      <main className="min-h-screen flex-1 w-full">
+      <main className="min-h-screen pb-16 md:pb-0 flex-1 w-full">
         <Suspense
           fallback={
             <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16 bg-background/80 backdrop-blur-md sticky top-0 z-50" />

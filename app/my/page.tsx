@@ -4,8 +4,6 @@ import { getDeadlines, syncDeadlines } from "@/app/actions/deadlines";
 import { redirect } from "next/navigation";
 import Deadlines from "@/components/dedlines";
 import { Metadata } from "next";
-import { PushNotifications } from "@/components/push-notifications";
-
 export const metadata: Metadata = {
   title: "My Dashboard",
   description: "View your schedule and deadlines.",
@@ -73,9 +71,6 @@ export default async function DashboardPage() {
   // console.log(deadlines);
   return (
     <div className="">
-      <div className="px-6 pt-4">
-        <PushNotifications />
-      </div>
       <Schedule group={user.user_metadata?.group} initialData={scheduleData} />
       {deadlines.length > 0 ? (
         <Deadlines deadlines={deadlines} />

@@ -4,7 +4,6 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
-import { ServiceWorkerRegister } from "./_components/ServiceWorkerRegister";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -80,7 +79,6 @@ export default function RootLayout({
         )}
       </head>
       <body className={`${geistSans.className} antialiased`}>
-          <ServiceWorkerRegister />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
