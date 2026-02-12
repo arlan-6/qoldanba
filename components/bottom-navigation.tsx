@@ -14,7 +14,7 @@ export default function BottomNavigation({}: BottomNavigationProps) {
   if (pathname === "/") return null; // Don't show on landing page
   return (
     <nav
-      className="md:hidden fixed left-0 right-0 bottom-0 z-50 h-16 border-t border-primary/20 bg-black/40 backdrop-blur-lg"
+      className="md:hidden fixed left-0 right-0 bottom-0 z-50 pb-4 pt-2 h-22 border-t border-primary/20 bg-black/40 backdrop-blur-lg"
       style={{ position: "fixed", left: 0, right: 0, bottom: 0, top: "auto" }}
     >
       <div className="w-full max-w-5xl mx-auto h-full flex justify-between items-center px-5">

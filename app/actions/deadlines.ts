@@ -1,25 +1,28 @@
-'use server';
+"use server";
 
-import { createClient } from '@/lib/supabase/server';
-import { revalidatePath } from 'next/cache';
-import { parseIcsEvents, detectEventType, parseIcsDate } from '@/lib/ics';
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { parseIcsEvents, detectEventType, parseIcsDate } from "@/lib/ics";
 
-export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) {
+export async function syncDeadlines(
+  icsUrl: string,
+  revalidate: boolean = true,
+) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) return { error: 'Unauthorized' };
+  if (!user) return { error: "Unauthorized" };
 
   try {
     try {
       const parsed = new URL(icsUrl);
-      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-        return { error: 'Invalid protocol' };
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+        return { error: "Invalid protocol" };
       }
     } catch {
-      return { error: 'Invalid URL' };
+      return { error: "Invalid URL" };
     }
 
     const controller = new AbortController();
@@ -30,24 +33,24 @@ export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) 
     } finally {
       clearTimeout(timeoutId);
     }
-    if (!res.ok) throw new Error('Failed to fetch ICS');
+    if (!res.ok) throw new Error("Failed to fetch ICS");
     const icsText = await res.text();
     const events = parseIcsEvents(icsText);
 
     if (events.length === 0) return { count: 0 };
 
     const rows = events
-      .filter((ev) => !!!ev.SUMMARY?.toLowerCase().includes('attendance')) // Skip events with 'Attendance' in the title
+      .filter((ev) => !!!ev.SUMMARY?.toLowerCase().includes("attendance")) // Skip events with 'Attendance' in the title
       .map((ev) => {
-        const categories = ev.CATEGORIES ?? '';
-        const [subject, lecturer] = categories.split('|').map((s) => s.trim());
-        const title = ev.SUMMARY ?? 'Untitled';
+        const categories = ev.CATEGORIES ?? "";
+        const [subject, lecturer] = categories.split("|").map((s) => s.trim());
+        const title = ev.SUMMARY ?? "Untitled";
         const eventType = detectEventType(title);
 
         return {
           user_id: user.id,
           ics_uid: ev.UID,
-          source: 'lms',
+          source: "lms",
           title,
           description: ev.DESCRIPTION || null,
           event_type: eventType,
@@ -55,7 +58,9 @@ export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) 
           lecturer: lecturer || null,
           start_at: parseIcsDate(ev.DTSTART),
           end_at: parseIcsDate(ev.DTEND),
-          ics_last_modified: ev['LAST-MODIFIED'] ? parseIcsDate(ev['LAST-MODIFIED']) : null,
+          ics_last_modified: ev["LAST-MODIFIED"]
+            ? parseIcsDate(ev["LAST-MODIFIED"])
+            : null,
           ics_dtstamp: ev.DTSTAMP ? parseIcsDate(ev.DTSTAMP) : null,
           raw_vevent: ev.__raw,
         };
@@ -66,8 +71,8 @@ export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) 
       });
 
     const { error } = await supabase
-      .from('deadlines')
-      .upsert(rows, { onConflict: 'user_id, ics_uid' });
+      .from("deadlines")
+      .upsert(rows, { onConflict: "user_id, ics_uid" });
 
     if (error) throw error;
 
@@ -75,30 +80,30 @@ export async function syncDeadlines(icsUrl: string, revalidate: boolean = true) 
     // We do this after upsert to ensure even if the ICS had them, they get removed if they are now past.
     // (Though the filter above prevents new ones, this cleans old ones).
     await supabase
-      .from('deadlines')
+      .from("deadlines")
       .delete()
-      .lt('end_at', new Date().toISOString())
-      .eq('user_id', user.id); // Safety check for user
+      .lt("end_at", new Date().toISOString())
+      .eq("user_id", user.id); // Safety check for user
 
     if (revalidate) {
-      revalidatePath('/my');
+      revalidatePath("/my");
+      revalidateTag(`deadlines-${user.id}`, "max");
     }
-    
+
     // Fetch fresh deadlines to return to the UI (bypassing request memoization via unique query)
     const { data: freshDeadlines } = await supabase
-      .from('deadlines')
-      .select('*')
-      .eq('user_id', user.id)
-      .gte('end_at', new Date().toISOString()) // Also acts as a cache buster due to varying timestamp
-      .order('end_at', { ascending: true });
+      .from("deadlines")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("end_at", new Date().toISOString()) // Also acts as a cache buster due to varying timestamp
+      .order("end_at", { ascending: true });
 
     return { count: rows.length, deadlines: freshDeadlines || [] };
   } catch (error: any) {
-    console.error('Sync error:', error);
+    console.error("Sync error:", error);
     return { error: error.message };
   }
 }
-
 
 export async function getDeadlines() {
   const supabase = await createClient();
@@ -109,13 +114,13 @@ export async function getDeadlines() {
   if (!user) return [];
 
   const { data: deadlines, error } = await supabase
-    .from('deadlines')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('end_at', { ascending: true });
+    .from("deadlines")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("end_at", { ascending: true });
 
   if (error) {
-    console.error('Error fetching deadlines:', error);
+    console.error("Error fetching deadlines:", error);
     return [];
   }
 
@@ -128,21 +133,19 @@ export async function updateDeadline(id: string, updates: any) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) throw new Error('Unauthorized');
+  if (!user) throw new Error("Unauthorized");
 
   const { error } = await supabase
-    .from('deadlines')
+    .from("deadlines")
     .update(updates)
-    .eq('id', id)
-    .eq('user_id', user.id);
+    .eq("id", id)
+    .eq("user_id", user.id);
 
   if (error) {
-    console.error('Error updating deadline:', error);
-    throw new Error('Failed to update deadline');
+    console.error("Error updating deadline:", error);
+    throw new Error("Failed to update deadline");
   }
 
-  revalidatePath('/my');
+  revalidatePath("/my");
   return { success: true };
 }
-
-

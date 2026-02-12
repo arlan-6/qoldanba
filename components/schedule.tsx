@@ -50,6 +50,13 @@ const DAYS_ORDER = [
   "Sunday",
 ];
 
+const ONE_HOUR_MS = 60 * 60 * 1000;
+
+type ScheduleCache = {
+  updatedAt: number;
+  data: WeekSchedule;
+};
+
 const getDayName = (date: Date): string => {
   const days = [
     "Sunday",
@@ -70,10 +77,10 @@ const getWeekNumber = (date: Date): number => {
     startOfYear.getTime() +
       (dayOfWeek <= 4
         ? (4 - dayOfWeek) * 24 * 60 * 60 * 1000
-        : (11 - dayOfWeek) * 24 * 60 * 60 * 1000)
+        : (11 - dayOfWeek) * 24 * 60 * 60 * 1000),
   );
   const diffInDays = Math.floor(
-    (date.getTime() - firstMonday.getTime()) / (24 * 60 * 60 * 1000)
+    (date.getTime() - firstMonday.getTime()) / (24 * 60 * 60 * 1000),
   );
   return Math.ceil((diffInDays + 1) / 7);
 };
@@ -87,7 +94,7 @@ export const Schedule: FC<ScheduleProps> = ({
     ? `qoldanba:schedule:${group.toUpperCase()}`
     : null;
   const [weekSchedule, setWeekSchedule] = useState<WeekSchedule | null>(
-    initialData || null
+    initialData || null,
   );
   const [isLoading, setIsLoading] = useState(!initialData && !!group);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +102,10 @@ export const Schedule: FC<ScheduleProps> = ({
   useEffect(() => {
     if (!scheduleCacheKey || !initialData) return;
     try {
-      localStorage.setItem(scheduleCacheKey, JSON.stringify(initialData));
+      localStorage.setItem(
+        scheduleCacheKey,
+        JSON.stringify({ updatedAt: Date.now(), data: initialData }),
+      );
     } catch {}
   }, [initialData, scheduleCacheKey]);
 
@@ -120,7 +130,28 @@ export const Schedule: FC<ScheduleProps> = ({
       if (!scheduleCacheKey) return null;
       try {
         const raw = localStorage.getItem(scheduleCacheKey);
-        return raw ? (JSON.parse(raw) as WeekSchedule) : null;
+        if (!raw) return null;
+
+        const parsed = JSON.parse(raw) as ScheduleCache | WeekSchedule;
+
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          "updatedAt" in parsed &&
+          "data" in parsed
+        ) {
+          const cache = parsed as ScheduleCache;
+          const isFresh = Date.now() - cache.updatedAt < ONE_HOUR_MS;
+          return {
+            data: cache.data,
+            isFresh,
+          };
+        }
+
+        return {
+          data: parsed as WeekSchedule,
+          isFresh: false,
+        };
       } catch {
         return null;
       }
@@ -128,6 +159,15 @@ export const Schedule: FC<ScheduleProps> = ({
 
     const fetchSchedule = async () => {
       try {
+        const cached = loadCachedSchedule();
+        if (cached?.data) {
+          setWeekSchedule(cached.data);
+          setIsLoading(!cached.isFresh);
+          if (cached.isFresh) {
+            return;
+          }
+        }
+
         const { data, error } = await supabase
           .from("schedules")
           .select("week_schedule")
@@ -138,9 +178,8 @@ export const Schedule: FC<ScheduleProps> = ({
 
         if (error) {
           console.error("Error fetching schedule:", error);
-          const cached = loadCachedSchedule();
-          if (cached) {
-            setWeekSchedule(cached);
+          if (cached?.data) {
+            setWeekSchedule(cached.data);
           } else {
             setError("Unable to load schedule");
             setWeekSchedule(null);
@@ -160,7 +199,7 @@ export const Schedule: FC<ScheduleProps> = ({
             try {
               localStorage.setItem(
                 scheduleCacheKey,
-                JSON.stringify(sortedSchedule)
+                JSON.stringify({ updatedAt: Date.now(), data: sortedSchedule }),
               );
             } catch {}
           }
@@ -171,8 +210,8 @@ export const Schedule: FC<ScheduleProps> = ({
         if (!active) return;
         console.error("Unexpected error:", err);
         const cached = loadCachedSchedule();
-        if (cached) {
-          setWeekSchedule(cached);
+        if (cached?.data) {
+          setWeekSchedule(cached.data);
           setError(null);
         } else {
           setError("Unable to load schedule");
@@ -211,12 +250,12 @@ export const Schedule: FC<ScheduleProps> = ({
   const weekNumber = today ? getWeekNumber(today) : "";
 
   const todaySessions = (weekSchedule?.[todayName] || []).filter(
-    (sessions) => sessions.classroom !== "online"
+    (sessions) => sessions.classroom !== "online",
   );
   const tomorrowSessions = weekSchedule?.[tomorrowName] || [];
   const allWeekSessions = weekSchedule
     ? DAYS_ORDER.map((day) => weekSchedule[day]).filter(
-        (sessions): sessions is Session[] => sessions !== undefined
+        (sessions): sessions is Session[] => sessions !== undefined,
       )
     : [];
 
@@ -276,7 +315,7 @@ export const Schedule: FC<ScheduleProps> = ({
                   className={cn(
                     "ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
                     // session.type === "lecture"
-                    "bg-secondary text-secondary-foreground"
+                    "bg-secondary text-secondary-foreground",
                     // : "bg-emerald-500 text-white",
                   )}
                 >
@@ -288,7 +327,7 @@ export const Schedule: FC<ScheduleProps> = ({
                     "ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
                     // session.type === "lecture"
                     // "bg-blue-500 text-white",
-                    "bg-primary text-primary-foreground"
+                    "bg-primary text-primary-foreground",
                   )}
                 >
                   University
@@ -299,7 +338,7 @@ export const Schedule: FC<ScheduleProps> = ({
                     "ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
                     // session.type === "lecture"
                     // "bg-blue-500 text-white",
-                    "bg-muted/80 text-muted-foreground"
+                    "bg-muted/80 text-muted-foreground",
                   )}
                 >
                   Passed

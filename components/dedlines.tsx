@@ -6,38 +6,132 @@ import DeadlinesHeader from "./deadlines/deadlines-header";
 import ViewTypeToggle from "./deadlines/view-type-toggle";
 import DeadlinesFilters from "./deadlines/deadlines-filters";
 import { motion } from "motion/react";
+import { createClient } from "@/lib/supabase/client";
 
-const STORAGE_KEY = "qoldanba:deadlines:last-viewed";
+const ONE_HOUR_MS = 60 * 60 * 1000;
 
-const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
+const getStorageKey = (userId?: string) =>
+  `qoldanba:deadlines:last-viewed:${userId ?? "anonymous"}`;
+
+type DeadlinesCache = {
+  updatedAt: number;
+  data: any[];
+};
+
+const Deadlines = ({
+  deadlines = [],
+  userId,
+}: {
+  deadlines?: any[];
+  userId?: string;
+}) => {
+  const supabase = React.useMemo(() => createClient(), []);
   const [showExams, setShowExams] = React.useState(true);
   const [showAssignments, setShowAssignments] = React.useState(true);
   const [showQuizzes, setShowQuizzes] = React.useState(true);
   const [showDeadlines, setShowDeadlines] = React.useState(true);
   const [viewType, setViewType] = React.useState<"list" | "card">("card");
   const [cachedDeadlines, setCachedDeadlines] = React.useState<any[] | null>(
-    null
+    null,
   );
+  const [isLoading, setIsLoading] = React.useState(!deadlines.length);
+
+  const storageKey = React.useMemo(() => getStorageKey(userId), [userId]);
 
   React.useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(storageKey);
       if (raw) {
-        setCachedDeadlines(JSON.parse(raw));
+        const parsed = JSON.parse(raw) as DeadlinesCache;
+        const isFresh = Date.now() - parsed.updatedAt < ONE_HOUR_MS;
+        if (Array.isArray(parsed.data) && parsed.data.length > 0) {
+          setCachedDeadlines(parsed.data);
+          if (isFresh) {
+            setIsLoading(false);
+          }
+        }
       }
     } catch {}
-  }, []);
+  }, [storageKey]);
+
+  React.useEffect(() => {
+    if (!userId) return;
+
+    let active = true;
+
+    const fetchDeadlines = async () => {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        const parsed = raw ? (JSON.parse(raw) as DeadlinesCache) : null;
+        const isFresh =
+          parsed?.updatedAt != null &&
+          Date.now() - parsed.updatedAt < ONE_HOUR_MS &&
+          Array.isArray(parsed.data) &&
+          parsed.data.length > 0;
+
+        if (isFresh) {
+          if (active) setIsLoading(false);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("deadlines")
+          .select("*")
+          .eq("user_id", userId)
+          .order("end_at", { ascending: true });
+
+        if (!active) return;
+
+        if (error) {
+          console.error("Error fetching deadlines:", error);
+          setIsLoading(false);
+          return;
+        }
+
+        const nextDeadlines = data ?? [];
+        setCachedDeadlines(nextDeadlines);
+        localStorage.setItem(
+          storageKey,
+          JSON.stringify({ updatedAt: Date.now(), data: nextDeadlines }),
+        );
+      } catch (error) {
+        if (!active) return;
+        console.error("Unexpected deadlines fetch error:", error);
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchDeadlines();
+
+    return () => {
+      active = false;
+    };
+  }, [storageKey, supabase, userId]);
 
   React.useEffect(() => {
     if (!deadlines || deadlines.length === 0) return;
     setCachedDeadlines(deadlines);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(deadlines));
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({ updatedAt: Date.now(), data: deadlines }),
+      );
     } catch {}
-  }, [deadlines]);
+  }, [deadlines, storageKey]);
 
   const effectiveDeadlines =
     deadlines && deadlines.length > 0 ? deadlines : cachedDeadlines || [];
+
+  if (isLoading && effectiveDeadlines.length === 0) {
+    return (
+      <div className="p-6 text-center text-muted-foreground">
+        Loading deadlines...
+      </div>
+    );
+  }
 
   if (!effectiveDeadlines || effectiveDeadlines.length === 0) {
     return (
@@ -83,14 +177,14 @@ const Deadlines = ({ deadlines }: { deadlines: any[] }) => {
         className={cn(
           viewType === "card"
             ? "grid gap-3 md:grid-cols-2 lg:grid-cols-4"
-            : "grid lg:grid-cols-2 gap-2"
+            : "grid lg:grid-cols-2 gap-2",
         )}
       >
         {filteredDeadlines.length > 0 ? (
           filteredDeadlines
             .sort(
               (a, b) =>
-                new Date(a.end_at).getTime() - new Date(b.end_at).getTime()
+                new Date(a.end_at).getTime() - new Date(b.end_at).getTime(),
             )
             .map((deadline) => (
               <DeadlinesCard

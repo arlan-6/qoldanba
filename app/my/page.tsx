@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { Schedule } from "@/components/schedule";
-import { getDeadlines, syncDeadlines } from "@/app/actions/deadlines";
 import { redirect } from "next/navigation";
 import Deadlines from "@/components/dedlines";
 import { Metadata } from "next";
@@ -28,55 +27,11 @@ export default async function DashboardPage() {
     redirect("/auth/github");
   }
 
-  // Parallel fetch: schedule + initial deadlines
-  const schedulePromise = user.user_metadata?.group
-    ? supabase
-        .from("schedules")
-        .select("week_schedule")
-        .eq("group_name", user.user_metadata.group.toUpperCase())
-        .single()
-    : Promise.resolve({ data: null });
-
-  const deadlinesPromise = getDeadlines();
-
-  const [scheduleResult, initialDeadlines] = await Promise.all([
-    schedulePromise,
-    deadlinesPromise,
-  ]);
-
-  const scheduleData = scheduleResult.data?.week_schedule;
-  let deadlines = initialDeadlines;
-
-  const lastSync =
-    deadlines.length > 0
-      ? new Date(
-          Math.max(
-            ...deadlines.map((d: any) => new Date(d.updated_at).getTime())
-          )
-        )
-      : null;
-
-  const shouldSync = !lastSync || Date.now() - lastSync.getTime() > 3600 * 1000;
-
-  if (user.user_metadata?.icsLink && shouldSync) {
-    // Sync logic handled by server action
-    const syncResult = await syncDeadlines(user.user_metadata.icsLink, false);
-    if (!syncResult.error && syncResult.deadlines) {
-      deadlines = syncResult.deadlines;
-    } else {
-      deadlines = await getDeadlines();
-    }
-  }
-
   // console.log(deadlines);
   return (
     <div className="">
-      <Schedule group={user.user_metadata?.group} initialData={scheduleData} />
-      {deadlines.length > 0 ? (
-        <Deadlines deadlines={deadlines} />
-      ) : (
-        <p>No deadlines available.</p>
-      )}
+      <Schedule group={user.user_metadata?.group} />
+      <Deadlines userId={user.id} />
     </div>
   );
 }
