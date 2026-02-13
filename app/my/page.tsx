@@ -31,7 +31,7 @@ export default async function DashboardPage() {
   return (
     <div className="">
       <Schedule group={user.user_metadata?.group} />
-      <Deadlines userId={user.id} />
+      <Deadlines userId={user.id} icsUrl={user.user_metadata?.icsLink} />
     </div>
   );
 }

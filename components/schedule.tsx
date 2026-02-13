@@ -1,6 +1,12 @@
 "use client";
 
-import React, { FC, useEffect, useMemo, useState } from "react";
+import React, {
+  FC,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Progress } from "./ui/progress";
@@ -50,7 +56,7 @@ const DAYS_ORDER = [
   "Sunday",
 ];
 
-const ONE_HOUR_MS = 60 * 60 * 1000;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 type ScheduleCache = {
   updatedAt: number;
@@ -99,6 +105,46 @@ export const Schedule: FC<ScheduleProps> = ({
   const [isLoading, setIsLoading] = useState(!initialData && !!group);
   const [error, setError] = useState<string | null>(null);
 
+  const loadCachedSchedule = React.useCallback(() => {
+    if (!scheduleCacheKey) return null;
+    try {
+      const raw = localStorage.getItem(scheduleCacheKey);
+      if (!raw) return null;
+
+      const parsed = JSON.parse(raw) as ScheduleCache | WeekSchedule;
+
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        "updatedAt" in parsed &&
+        "data" in parsed
+      ) {
+        const cache = parsed as ScheduleCache;
+        const isFresh = Date.now() - cache.updatedAt < ONE_DAY_MS;
+        return {
+          data: cache.data,
+          isFresh,
+        };
+      }
+
+      return {
+        data: parsed as WeekSchedule,
+        isFresh: false,
+      };
+    } catch {
+      return null;
+    }
+  }, [scheduleCacheKey]);
+
+  useLayoutEffect(() => {
+    if (initialData) return;
+    const cached = loadCachedSchedule();
+    if (cached?.data) {
+      setWeekSchedule(cached.data);
+      setIsLoading(false);
+    }
+  }, [initialData, loadCachedSchedule]);
+
   useEffect(() => {
     if (!scheduleCacheKey || !initialData) return;
     try {
@@ -123,46 +169,20 @@ export const Schedule: FC<ScheduleProps> = ({
     }
 
     let active = true;
-    setIsLoading(true);
+    const cached = loadCachedSchedule();
+    if (cached?.data) {
+      setWeekSchedule(cached.data);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
     setError(null);
-
-    const loadCachedSchedule = () => {
-      if (!scheduleCacheKey) return null;
-      try {
-        const raw = localStorage.getItem(scheduleCacheKey);
-        if (!raw) return null;
-
-        const parsed = JSON.parse(raw) as ScheduleCache | WeekSchedule;
-
-        if (
-          parsed &&
-          typeof parsed === "object" &&
-          "updatedAt" in parsed &&
-          "data" in parsed
-        ) {
-          const cache = parsed as ScheduleCache;
-          const isFresh = Date.now() - cache.updatedAt < ONE_HOUR_MS;
-          return {
-            data: cache.data,
-            isFresh,
-          };
-        }
-
-        return {
-          data: parsed as WeekSchedule,
-          isFresh: false,
-        };
-      } catch {
-        return null;
-      }
-    };
 
     const fetchSchedule = async () => {
       try {
-        const cached = loadCachedSchedule();
         if (cached?.data) {
           setWeekSchedule(cached.data);
-          setIsLoading(!cached.isFresh);
+          setIsLoading(false);
           if (cached.isFresh) {
             return;
           }
@@ -228,26 +248,19 @@ export const Schedule: FC<ScheduleProps> = ({
     return () => {
       active = false;
     };
-  }, [group, supabase, initialData]);
+  }, [group, supabase, initialData, loadCachedSchedule]);
 
-  const [mounted, setMounted] = useState(false);
-  const [today, setToday] = useState<Date | null>(null);
-
-  useEffect(() => {
-    setMounted(true);
-    setToday(new Date());
-  }, []);
+  const [today] = useState<Date>(() => new Date());
 
   const tomorrow = useMemo(() => {
-    if (!today) return null;
     const date = new Date(today);
     date.setDate(date.getDate() + 1);
     return date;
   }, [today]);
 
-  const todayName = today ? getDayName(today) : "";
-  const tomorrowName = tomorrow ? getDayName(tomorrow) : "";
-  const weekNumber = today ? getWeekNumber(today) : "";
+  const todayName = getDayName(today);
+  const tomorrowName = getDayName(tomorrow);
+  const weekNumber = getWeekNumber(today);
 
   const todaySessions = (weekSchedule?.[todayName] || []).filter(
     (sessions) => sessions.classroom !== "online",
@@ -270,7 +283,7 @@ export const Schedule: FC<ScheduleProps> = ({
     return Math.max(max, endPercent);
   }, 0);
 
-  if (isLoading || !mounted || !today || !tomorrow) {
+  if (isLoading) {
     return <ScheduleSkeleton className={className} />;
   }
 

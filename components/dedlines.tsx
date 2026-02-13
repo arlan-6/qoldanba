@@ -8,8 +8,6 @@ import DeadlinesFilters from "./deadlines/deadlines-filters";
 import { motion } from "motion/react";
 import { createClient } from "@/lib/supabase/client";
 
-const ONE_HOUR_MS = 60 * 60 * 1000;
-
 const getStorageKey = (userId?: string) =>
   `qoldanba:deadlines:last-viewed:${userId ?? "anonymous"}`;
 
@@ -18,12 +16,47 @@ type DeadlinesCache = {
   data: any[];
 };
 
+const readCacheFromCookie = (key: string): DeadlinesCache | null => {
+  try {
+    const encodedKey = `${encodeURIComponent(key)}=`;
+    const entry = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(encodedKey));
+
+    if (!entry) return null;
+
+    const encodedValue = entry.slice(encodedKey.length);
+    const decodedValue = decodeURIComponent(encodedValue);
+    return JSON.parse(decodedValue) as DeadlinesCache;
+  } catch {
+    return null;
+  }
+};
+
+const writeCacheToCookie = (key: string, cache: DeadlinesCache) => {
+  try {
+    const value = encodeURIComponent(JSON.stringify(cache));
+    document.cookie = `${encodeURIComponent(key)}=${value}; max-age=${60 * 60}; path=/; SameSite=Lax`;
+  } catch {}
+};
+
+const filterUpcomingDeadlines = (items: any[]) => {
+  const now = Date.now();
+  return (items || []).filter((item) => {
+    if (!item?.end_at) return true;
+    const endTime = new Date(item.end_at).getTime();
+    return Number.isFinite(endTime) ? endTime >= now : true;
+  });
+};
+
 const Deadlines = ({
   deadlines = [],
   userId,
+  icsUrl,
 }: {
   deadlines?: any[];
   userId?: string;
+  icsUrl?: string;
 }) => {
   const supabase = React.useMemo(() => createClient(), []);
   const [showExams, setShowExams] = React.useState(true);
@@ -34,24 +67,18 @@ const Deadlines = ({
   const [cachedDeadlines, setCachedDeadlines] = React.useState<any[] | null>(
     null,
   );
-  const [isLoading, setIsLoading] = React.useState(!deadlines.length);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const storageKey = React.useMemo(() => getStorageKey(userId), [userId]);
 
   React.useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) {
-        const parsed = JSON.parse(raw) as DeadlinesCache;
-        const isFresh = Date.now() - parsed.updatedAt < ONE_HOUR_MS;
-        if (Array.isArray(parsed.data) && parsed.data.length > 0) {
-          setCachedDeadlines(parsed.data);
-          if (isFresh) {
-            setIsLoading(false);
-          }
-        }
-      }
-    } catch {}
+    const parsed = readCacheFromCookie(storageKey);
+    if (!parsed || !Array.isArray(parsed.data) || parsed.data.length === 0) {
+      return;
+    }
+
+    const upcoming = filterUpcomingDeadlines(parsed.data);
+    setCachedDeadlines(upcoming);
   }, [storageKey]);
 
   React.useEffect(() => {
@@ -61,39 +88,50 @@ const Deadlines = ({
 
     const fetchDeadlines = async () => {
       try {
-        const raw = localStorage.getItem(storageKey);
-        const parsed = raw ? (JSON.parse(raw) as DeadlinesCache) : null;
-        const isFresh =
-          parsed?.updatedAt != null &&
-          Date.now() - parsed.updatedAt < ONE_HOUR_MS &&
-          Array.isArray(parsed.data) &&
-          parsed.data.length > 0;
-
-        if (isFresh) {
-          if (active) setIsLoading(false);
-          return;
+        if (active) {
+          setIsLoading(true);
         }
 
-        const { data, error } = await supabase
-          .from("deadlines")
-          .select("*")
-          .eq("user_id", userId)
-          .order("end_at", { ascending: true });
+        const loadFromDatabase = async () => {
+          const { data, error } = await supabase
+            .from("deadlines")
+            .select("*")
+            .eq("user_id", userId)
+            .gte("end_at", new Date().toISOString())
+            .order("end_at", { ascending: true });
 
-        if (!active) return;
+          if (!active) return;
 
-        if (error) {
-          console.error("Error fetching deadlines:", error);
-          setIsLoading(false);
-          return;
+          if (error) {
+            console.error("Error fetching deadlines:", error);
+            return;
+          }
+
+          const nextDeadlines = filterUpcomingDeadlines(data ?? []);
+          setCachedDeadlines(nextDeadlines);
+          const nextUpdatedAt = Date.now();
+          writeCacheToCookie(storageKey, {
+            updatedAt: nextUpdatedAt,
+            data: nextDeadlines,
+          });
+        };
+
+        // 1) Always read latest from DB first (source of truth)
+        await loadFromDatabase();
+
+        // 2) Always sync from ICS in background
+        if (icsUrl) {
+          await fetch("/api/sync-ics", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ icsUrl }),
+          });
+
+          // 3) Re-read DB after sync so UI gets synced data
+          await loadFromDatabase();
         }
-
-        const nextDeadlines = data ?? [];
-        setCachedDeadlines(nextDeadlines);
-        localStorage.setItem(
-          storageKey,
-          JSON.stringify({ updatedAt: Date.now(), data: nextDeadlines }),
-        );
       } catch (error) {
         if (!active) return;
         console.error("Unexpected deadlines fetch error:", error);
@@ -109,21 +147,23 @@ const Deadlines = ({
     return () => {
       active = false;
     };
-  }, [storageKey, supabase, userId]);
+  }, [icsUrl, storageKey, supabase, userId]);
 
   React.useEffect(() => {
     if (!deadlines || deadlines.length === 0) return;
-    setCachedDeadlines(deadlines);
-    try {
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({ updatedAt: Date.now(), data: deadlines }),
-      );
-    } catch {}
+    const upcoming = filterUpcomingDeadlines(deadlines);
+    setCachedDeadlines(upcoming);
+    const nextUpdatedAt = Date.now();
+    writeCacheToCookie(storageKey, {
+      updatedAt: nextUpdatedAt,
+      data: upcoming,
+    });
   }, [deadlines, storageKey]);
 
   const effectiveDeadlines =
-    deadlines && deadlines.length > 0 ? deadlines : cachedDeadlines || [];
+    deadlines && deadlines.length > 0
+      ? filterUpcomingDeadlines(deadlines)
+      : cachedDeadlines || [];
 
   if (isLoading && effectiveDeadlines.length === 0) {
     return (
