@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { AuthButton } from "@/components/auth-button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+// import { ThemeSwitcher } from "@/components/theme-switcher";
 import { EnvVarWarning } from "@/components/env-var-warning";
 import { hasEnvVars } from "@/lib/utils";
 import { Fugaz_One } from "next/font/google";
@@ -54,7 +54,7 @@ export default async function Navigation() {
 
           <div className="flex items-center gap-4">
             {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
-            <ThemeSwitcher />
+            {/* <ThemeSwitcher /> */}
             <SidebarTriggerNav />
           </div>
         </div>
