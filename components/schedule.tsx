@@ -14,10 +14,10 @@ import TimeSteps from "./time-steps";
 import {
   Tabs,
   TabsContent,
-  TabsContents,
+  // TabsContents,
   TabsList,
   TabsTrigger,
-} from "@/components/animate-ui/components/animate/tabs";
+} from "@/components/ui/tabs";
 import { ScheduleSkeleton } from "./schedule-skeleton";
 
 interface ScheduleProps {
@@ -360,7 +360,7 @@ export const Schedule: FC<ScheduleProps> = ({
             </TooltipContent>
           </Tooltip>
         </TabsList>
-        <TabsContents>
+        {/* <TabsContents> */}
           <TabsContent value="today" className="p-4">
             {/* Today */}
             <div>
@@ -455,7 +455,7 @@ export const Schedule: FC<ScheduleProps> = ({
               </ScrollArea>
             </div>
           </TabsContent>
-        </TabsContents>
+        {/* </TabsContents> */}
       </Tabs>
     </div>
   );
