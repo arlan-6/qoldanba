@@ -135,7 +135,7 @@ const SidebarCalendar = ({ activities }: { activities?: Activity[] }) => {
         showOutsideDays={false}
         weekStartsOn={1}
         captionLayout="dropdown"
-        className="w-full border-0 p-0 bg-transparent text-sm"
+        className="w-full border-0 p-0 bg-transparent text-xs"
         modifiers={{
           green: (d) =>
             parsedActivities.some(
@@ -303,7 +303,7 @@ const SidebarCalendar = ({ activities }: { activities?: Activity[] }) => {
       <div className="mt-8 md:mt-0">
         {typeLegend.length > 0 && (
           <ScrollArea>
-            <div className="flex gap-2 pt-2">
+            <div className="flex flex-wrap gap-2 pt-2">
               {typeLegend.map((type) => {
                 const color = colorByType(type);
                 const styles = colorStyles[color];

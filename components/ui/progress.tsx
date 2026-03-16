@@ -61,13 +61,11 @@ interface ProgressProps extends React.ComponentPropsWithoutRef<
 function SessionIndicatorCard({
   session,
   index,
-  sessions,
   proportionalValue,
   isTomorrowCard = false,
 }: {
   session: Session;
   index: number;
-  sessions: Session[];
   proportionalValue: number;
   isTomorrowCard: boolean;
 }) {
@@ -79,6 +77,8 @@ function SessionIndicatorCard({
     timeStringToPercent(endTimeStr),
   );
 
+  const isOnlineSession = session.classroom.toLowerCase() === "online";
+
   const currentPercent = proportionalValue;
   let status: "passed" | "current" | "upcoming" | "online" = "upcoming";
 
@@ -87,12 +87,37 @@ function SessionIndicatorCard({
   } else if (currentPercent >= startPercent && currentPercent <= endPercent) {
     status = "current";
   }
-  if (session.classroom === "Online") {
+  if (isOnlineSession) {
     status = "online";
   }
   if (isTomorrowCard) {
     status = "upcoming";
   }
+
+  const statusBadgeClass =
+    status === "current"
+      ? "bg-emerald-500/20 text-emerald-100 border-emerald-400/40"
+      : status === "passed"
+        ? "bg-muted/80 text-foreground border-border"
+        : status === "online"
+          ? "bg-sky-500/20 text-sky-100 border-sky-400/40"
+          : "bg-amber-500/20 text-amber-100 border-amber-400/40";
+
+  const typeBadgeClass =
+    session.type === "practice"
+      ? "bg-blue-500/20 text-blue-100 border-blue-400/40"
+      : "bg-violet-500/20 text-violet-100 border-violet-400/40";
+
+  const statusLabel =
+    status === "current"
+      ? "In progress"
+      : status === "passed"
+        ? "Done"
+        : status === "online"
+          ? "Online"
+          : "Upcoming";
+
+  const typeLabel = session.type === "practice" ? "Practice" : "Lecture";
 
   return (
     <HoverCard key={index} openDelay={50} closeDelay={50}>
@@ -107,7 +132,7 @@ function SessionIndicatorCard({
               "bg-muted-foreground/80   hover:grayscale-0 hover:opacity-100",
             status === "current" && "ring-2 ring-offset-1  z-10  ",
             status !== "passed" &&
-              (session.classroom === "online"
+              (isOnlineSession
                 ? "bg-secondary hover:bg-secondary/80"
                 : session.type === "lecture"
                   ? "bg-primary hover:bg-primary/80"
@@ -120,46 +145,59 @@ function SessionIndicatorCard({
         />
       </HoverCardTrigger>
       <HoverCardContent
-        className="max-w-sm p-4 text-white backdrop-blur-md border border-primary/40 shadow-md shadow-primary/20"
-        style={{ backgroundColor: "oklch(0.18 0.005 53.043 / 0.7)" }}
+        sideOffset={10}
+        className="w-84 rounded-xl border border-border bg-card p-4 text-card-foreground shadow-2xl"
       >
-        <div className="space-y-2.5">
-          <div className="border-b border-primary/40 pb-2">
-            <h3 className="font-bold text-base leading-tight flex items-center gap-2 text-primary">
-              <BookOpen className="w-4 h-4" />
-              {session.discipline}
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-3 border-b border-border/70 pb-3">
+            <h3 className="font-semibold text-base leading-tight flex items-center gap-2 text-foreground">
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span className="line-clamp-2">{session.discipline}</span>
             </h3>
+            <span
+              className={cn(
+                "rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide whitespace-nowrap",
+                statusBadgeClass,
+              )}
+            >
+              {statusLabel}
+            </span>
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-base font-semibold text-foreground">
                 {session.time}
               </span>
             </div>
             <span
               className={cn(
-                "px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide",
-                "bg-primary/20 text-primary border border-primary/40",
+                "rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide",
+                typeBadgeClass,
               )}
             >
-              {session.type}
+              {typeLabel}
             </span>
           </div>
+
           <div className="flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-sm text-foreground">
+            <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-[1.05rem] font-medium text-foreground">
               {session.classroom}
             </span>
           </div>
-          <div className="flex items-start gap-1.5 pt-1 border-t border-muted/50">
-            <User className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
-            <span className="text-xs text-muted-foreground leading-relaxed">
-              {session.lecturer.length > 2
-                ? `${session.lecturer.slice(0, 2).join(", ")} +${
-                    session.lecturer.length - 2
-                  } more`
-                : session.lecturer.join(", ")}
+
+          <div className="flex items-start gap-1.5 border-t border-border/70 pt-2">
+            <User className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground leading-relaxed">
+              {session.lecturer.length === 0
+                ? "Unknown lecturer"
+                : session.lecturer.length > 2
+                  ? `${session.lecturer.slice(0, 2).join(", ")} +${
+                      session.lecturer.length - 2
+                    } more`
+                  : session.lecturer.join(", ")}
             </span>
           </div>
         </div>
@@ -258,11 +296,11 @@ function CurrentTimeIndicator({
         <ProgressPrimitive.Indicator
           data-slot="progress-indicator"
           className={cn(
-            "absolute top-0 h-full w-[3px] rounded-full z-30 transition-all",
-            "bg-gradient-to-b from-red-400 via-red-500 to-red-600",
+            "absolute top-0 h-full w-0.75 rounded-full z-30 transition-all",
+            "bg-linear-to-b from-red-400 via-red-500 to-red-600",
             "shadow-[0_0_10px_rgba(239,68,68,0.75)]",
             "animate-pulse",
-            "hover:w-[5px] hover:shadow-[0_0_16px_rgba(239,68,68,0.95)]",
+            "hover:w-1.25 hover:shadow-[0_0_16px_rgba(239,68,68,0.95)]",
           )}
           style={{ left: `calc(${proportionalValue}% - 2px)` }}
           title={currentTimeTitle}
@@ -363,15 +401,12 @@ function Progress({
             key={index}
             session={session}
             index={index}
-            sessions={sessions}
             proportionalValue={proportionalValue}
             isTomorrowCard={isTomorrow}
           />
         ))}
 
-        {weekSessions && (
-          <WeekSessionsIndicators weekSessions={weekSessions} />
-        )}
+        {weekSessions && <WeekSessionsIndicators weekSessions={weekSessions} />}
 
         <CurrentTimeIndicator
           proportionalValue={proportionalValue}

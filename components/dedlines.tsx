@@ -16,27 +16,25 @@ type DeadlinesCache = {
   data: any[];
 };
 
-const readCacheFromCookie = (key: string): DeadlinesCache | null => {
+const DEADLINES_CACHE_TTL_MS = 15 * 60 * 1000;
+
+const readCacheFromStorage = (key: string): DeadlinesCache | null => {
   try {
-    const encodedKey = `${encodeURIComponent(key)}=`;
-    const entry = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith(encodedKey));
-
-    if (!entry) return null;
-
-    const encodedValue = entry.slice(encodedKey.length);
-    const decodedValue = decodeURIComponent(encodedValue);
-    return JSON.parse(decodedValue) as DeadlinesCache;
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as DeadlinesCache;
+    if (!parsed || !Array.isArray(parsed.data) || !parsed.updatedAt) {
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
 };
 
-const writeCacheToCookie = (key: string, cache: DeadlinesCache) => {
+const writeCacheToStorage = (key: string, cache: DeadlinesCache) => {
   try {
-    const value = encodeURIComponent(JSON.stringify(cache));
-    document.cookie = `${encodeURIComponent(key)}=${value}; max-age=${60 * 60}; path=/; SameSite=Lax`;
+    localStorage.setItem(key, JSON.stringify(cache));
   } catch {}
 };
 
@@ -67,18 +65,22 @@ const Deadlines = ({
   const [cachedDeadlines, setCachedDeadlines] = React.useState<any[] | null>(
     null,
   );
+  const [cacheUpdatedAt, setCacheUpdatedAt] = React.useState<number | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = React.useState(true);
 
   const storageKey = React.useMemo(() => getStorageKey(userId), [userId]);
 
   React.useEffect(() => {
-    const parsed = readCacheFromCookie(storageKey);
+    const parsed = readCacheFromStorage(storageKey);
     if (!parsed || !Array.isArray(parsed.data) || parsed.data.length === 0) {
       return;
     }
 
     const upcoming = filterUpcomingDeadlines(parsed.data);
     setCachedDeadlines(upcoming);
+    setCacheUpdatedAt(parsed.updatedAt);
   }, [storageKey]);
 
   React.useEffect(() => {
@@ -110,7 +112,8 @@ const Deadlines = ({
           const nextDeadlines = filterUpcomingDeadlines(data ?? []);
           setCachedDeadlines(nextDeadlines);
           const nextUpdatedAt = Date.now();
-          writeCacheToCookie(storageKey, {
+          setCacheUpdatedAt(nextUpdatedAt);
+          writeCacheToStorage(storageKey, {
             updatedAt: nextUpdatedAt,
             data: nextDeadlines,
           });
@@ -154,7 +157,8 @@ const Deadlines = ({
     const upcoming = filterUpcomingDeadlines(deadlines);
     setCachedDeadlines(upcoming);
     const nextUpdatedAt = Date.now();
-    writeCacheToCookie(storageKey, {
+    setCacheUpdatedAt(nextUpdatedAt);
+    writeCacheToStorage(storageKey, {
       updatedAt: nextUpdatedAt,
       data: upcoming,
     });
@@ -164,6 +168,10 @@ const Deadlines = ({
     deadlines && deadlines.length > 0
       ? filterUpcomingDeadlines(deadlines)
       : cachedDeadlines || [];
+
+  const isCacheStale =
+    cacheUpdatedAt !== null &&
+    Date.now() - cacheUpdatedAt > DEADLINES_CACHE_TTL_MS;
 
   if (isLoading && effectiveDeadlines.length === 0) {
     return (
@@ -200,6 +208,12 @@ const Deadlines = ({
     <div className="p-6 pt-2">
       <div className="flex flex-wrap items-center justify-between mb-4">
         <DeadlinesHeader count={filteredDeadlines.length} />
+
+        {isCacheStale && (
+          <p className="text-xs text-muted-foreground">
+            Refreshing stale data...
+          </p>
+        )}
 
         <div className="flex flex-wrap items-center gap-2 pt-4">
           <ViewTypeToggle viewType={viewType} setViewType={setViewType} />

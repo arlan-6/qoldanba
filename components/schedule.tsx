@@ -181,11 +181,9 @@ export const Schedule: FC<ScheduleProps> = ({
     const fetchSchedule = async () => {
       try {
         if (cached?.data) {
+          // Render cached schedule immediately, then refresh in background.
           setWeekSchedule(cached.data);
           setIsLoading(false);
-          if (cached.isFresh) {
-            return;
-          }
         }
 
         const { data, error } = await supabase

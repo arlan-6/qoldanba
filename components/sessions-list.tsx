@@ -69,24 +69,29 @@ const SessionsList = ({
     return [...acc, session];
   }, []);
 
+  const visibleSessions = mergedSessions.filter(
+    (session) => session.classroom !== "online",
+  );
+
   // console.log(lastSessionEndTime , currentTimePercent)
   return (
     <div>
-      {mergedSessions.length > 0 ? (
+      {visibleSessions.length > 0 ? (
         <div className="mt-8">
           {/* <h3 className="text-base font-semibold mb-2">
             {isTomorrow ? "Tomorrow's Classes" : "Today's Classes"}
           </h3> */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mergedSessions.map((session, index) => {
-              if (session.classroom === "online") return;
+            {visibleSessions.map((session, index) => {
               const lecturers = Array.isArray(session.lecturer)
                 ? session.lecturer
                 : [];
 
+              const sessionKey = `${session.discipline}-${session.time}-${session.classroom}-${index}`;
+
               return (
                 <div
-                  key={index}
+                  key={sessionKey}
                   className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card"
                 >
                   <div className="flex justify-between flex-wrap">
@@ -107,14 +112,14 @@ const SessionsList = ({
                   </div>
 
                   {/* Classroom */}
-                    <Link href={`/my/aitumap?room=${session.classroom}`}>
-                  <div className="flex items-center gap-2 mb-2 underline underline-offset-2 underline-primary">
-                    
-                    <MapPin className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      {session.classroom}
-                    </span>
-                  </div></Link>
+                  <Link href={`/my/aitumap?room=${session.classroom}`}>
+                    <div className="flex items-center gap-2 mb-2 underline underline-offset-2 underline-primary">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {session.classroom}
+                      </span>
+                    </div>
+                  </Link>
 
                   {/* Lecturer */}
                   <div className="flex items-start gap-2">
@@ -131,7 +136,7 @@ const SessionsList = ({
                         "ml-auto px-2 py-0.5 rounded-sm text-xs font-bold uppercase tracking-wider",
                         session.type === "practice"
                           ? "bg-blue-500 text-white"
-                          : "bg-emerald-500 text-white"
+                          : "bg-emerald-500 text-white",
                       )}
                     >
                       {session.type}
@@ -142,21 +147,26 @@ const SessionsList = ({
             })}
           </div>
         </div>
-      ):(<>
-        <div className="m-6">
-          <blockquote className="border-l-2 border-yellow-500 pl-6 italic text-muted-foreground">
-            No classes scheduled for today. Enjoy your free time! ;D
-          </blockquote>
-        </div>
-      </>)}
-      {/* All passed message */}
-      {mergedSessions.length > 0 && currentTimePercent > lastSessionEndTime && (
-        <div className="m-6">
-          <blockquote className="border-l-2 border-emerald-500 pl-6 italic text-muted-foreground">
-            You passed all sessions
-          </blockquote>
-        </div>
+      ) : (
+        <>
+          <div className="m-6">
+            <blockquote className="border-l-2 border-yellow-500 pl-6 italic text-muted-foreground">
+              No classes scheduled for {isTomorrow ? "tomorrow" : "today"}.
+              Enjoy your free time! ;D
+            </blockquote>
+          </div>
+        </>
       )}
+      {/* All passed message */}
+      {!isTomorrow &&
+        visibleSessions.length > 0 &&
+        currentTimePercent > lastSessionEndTime && (
+          <div className="m-6">
+            <blockquote className="border-l-2 border-emerald-500 pl-6 italic text-muted-foreground">
+              You completed all sessions for today.
+            </blockquote>
+          </div>
+        )}
     </div>
   );
 };

@@ -3,9 +3,11 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -24,6 +26,7 @@ import {
 import Link from "next/link";
 import { headers } from "next/headers";
 import SidebarCalendar, { Activity } from "./sidebar-calendar";
+import { cn } from "@/lib/utils";
 import { ScrollArea } from "./ui/scroll-area";
 
 export async function AppSidebar({
@@ -129,46 +132,63 @@ export async function AppSidebar({
         collapsible="icon"
         {...props}
       >
-        <SidebarContent className="overflow-hidden">
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={fullName}
-                    isActive={currentUrl === "/my/profile"}
-                  >
-                    <Link href="/my/profile">
-                      <User />
-                      <span>{fullName}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton tooltip={group}>
-                    <Users />
-                    <span>{group}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-              <SidebarGroupLabel>Menu</SidebarGroupLabel>
-              <SidebarMenu>
-                <ScrollArea className="h-[400px] w-full">
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Dashboard">
-                    <Link href="/my">
-                      <LayoutDashboard />
-                      <span>Dashboard</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <div className="flex w-full">
+        <SidebarHeader className="">
+          <div
+            className={cn(
+              "rounded-xl bg-card/60 group-data-[collapsible=icon]:border-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0",
+              "",
+            )}
+          >
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={fullName}
+                  isActive={currentUrl === "/my/profile"}
+                  className="h-8 rounded-lg"
+                >
+                  <Link href="/my/profile">
+                    <User />
+                    <span className="truncate">{fullName}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
+                <SidebarMenuButton tooltip={group} className="h-8 rounded-lg">
+                  <Users />
+                  <span>{group}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </div>
+        </SidebarHeader>
+
+        <SidebarContent className="overflow-hidden p-0">
+          <ScrollArea className="h-full px-1">
+            <SidebarGroup>
+              <SidebarGroupLabel className="px-2 pb-1 text-md  tracking-wide text-muted-foreground/80">
+                Menu
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      className="flex-1 w-full"
+                      asChild
+                      tooltip="Dashboard"
+                      isActive={currentUrl === "/my"}
+                    >
+                      <Link href="/my">
+                        <LayoutDashboard />
+                        <span>Dashboard</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
                       asChild
                       tooltip="Links"
+                      isActive={currentUrl.startsWith("/my/links")}
                     >
                       <Link href="/my/links">
                         <LinkIcon />
@@ -176,11 +196,12 @@ export async function AppSidebar({
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
+
                   <SidebarMenuItem>
                     <SidebarMenuButton
-                      className="flex-1 w-full"
                       asChild
-                      tooltip="Links"
+                      tooltip="Map"
+                      isActive={currentUrl.startsWith("/my/aitumap")}
                     >
                       <Link href="/my/aitumap">
                         <MapIcon />
@@ -188,36 +209,56 @@ export async function AppSidebar({
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                </div>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Academic year">
-                    <Link href="/my/academic-year">
-                      <CalendarIcon />
-                      <span>Academic year</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarCalendar activities={activitiesList as Activity[]} />
-                </SidebarMenuItem>
-                </ScrollArea>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
 
-          <div className="mt-auto p-2">
-            {/* <SidebarGroupLabel>Support</SidebarGroupLabel> */}
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip="Academic year"
+                      isActive={currentUrl.startsWith("/my/academic-year")}
+                    >
+                      <Link href="/my/academic-year">
+                        <CalendarIcon />
+                        <span>Academic year</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
+                    <div className="mt-1 rounded-xl  bg-card/50">
+                      <SidebarCalendar
+                        activities={activitiesList as Activity[]}
+                      />
+                    </div>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </ScrollArea>
+        </SidebarContent>
+
+        <SidebarFooter className="border-t border-border/60 p-2 pt-2">
+          {/* <SidebarGroupLabel>Support</SidebarGroupLabel> */}
+          <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Questions?">
+              <SidebarMenuButton
+                asChild
+                tooltip="Questions?"
+                className="h-10 rounded-lg"
+              >
                 <Link href="https://t.me/ArLaN_XD" target="_blank">
                   <MailQuestion />
                   <span>Contact Telegram</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarTrigger className="cursor-pointer" size={"lg"} />
-          </div>
-        </SidebarContent>
+            <SidebarMenuItem>
+              <SidebarTrigger
+                // className="mt-1 w-full cursor-pointer rounded-lg"
+                size={"lg"}
+              />
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
       </Sidebar>
     );
   } catch (error) {
