@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Clock, MapPin, User } from "lucide-react";
+import { motion } from "motion/react";
 import Link from "next/link";
 
 interface Session {
@@ -90,7 +91,14 @@ const SessionsList = ({
               const sessionKey = `${session.discipline}-${session.time}-${session.classroom}-${index}`;
 
               return (
-                <div
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1}}
+                  transition={{
+                    duration: 0.65,
+                    delay: index * 0.03,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
                   key={sessionKey}
                   className="border rounded-lg p-3 hover:shadow-md transition-shadow bg-card"
                 >
@@ -142,7 +150,7 @@ const SessionsList = ({
                       {session.type}
                     </span>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>

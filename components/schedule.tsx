@@ -364,23 +364,6 @@ export const Schedule: FC<ScheduleProps> = ({
         <TabsContent value="today" className="p-4">
           {/* Today */}
           <div>
-            {/* <h2 className="text-xl  mb-0">
-                <span className="text-muted-foreground font-bold shadow-lg">
-                  {todayName}
-                </span>
-              </h2>
-              <div className="flex gap-16 mb-6 items-center">
-                <p className="  ">
-                  {todaySessions.length === 0 ? (
-                    <span className="text-muted-foreground">No classes :D</span>
-                  ) : (
-                    <span className="text-muted-foreground">
-                      {todaySessions.length} classes
-                    </span>
-                  )}
-                </p>
-              </div> */}
-
             {/* Time steps */}
             <TimeSteps daySchedule={todaySessions} />
 
@@ -401,21 +384,6 @@ export const Schedule: FC<ScheduleProps> = ({
         <TabsContent value="tomorrow" className=" p-4">
           {/* Tomorrow */}
           <div className="">
-            {/* <h2 className="text-xl mb-0">
-                <span className="text-muted-foreground font-bold shadow-lg">
-                  {tomorrowName}
-                </span>
-              </h2>
-              <p className="mb-6">
-                {tomorrowSessions.length === 0 ? (
-                  <span className="text-muted-foreground">No classes :D</span>
-                ) : (
-                  <span className="text-muted-foreground">
-                    {tomorrowSessions.length} classes
-                  </span>
-                )}
-              </p> */}
-
             {/* Time steps */}
             <TimeSteps daySchedule={tomorrowSessions} />
 

@@ -17,6 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../animate-ui/primitives/animate/tooltip";
+import { motion } from "motion/react";
 
 // Convert time percentage to position on evenly distributed timeline (7-21 hours)
 const convertToProportionalProgress = (linearPercent: number): number => {
@@ -122,31 +123,39 @@ function SessionIndicatorCard({
   return (
     <HoverCard key={index} openDelay={50} closeDelay={50}>
       <HoverCardTrigger onClick={(e) => e.stopPropagation()} asChild>
-        <ProgressPrimitive.Indicator
-          data-slot="progress-indicator"
-          className={cn(
-            "absolute my-0.5 h-2 w-20 transition-all duration-200 cursor-pointer rounded-sm",
-            " hover:shadow-lg  first:ml-0.5",
-            "w-[6.9%]",
-            status === "passed" &&
-              "bg-muted-foreground/80   hover:grayscale-0 hover:opacity-100",
-            status === "current" && "ring-2 ring-offset-1  z-10  ",
-            status !== "passed" &&
-              (isOnlineSession
-                ? "bg-secondary hover:bg-secondary/80"
-                : session.type === "lecture"
-                  ? "bg-primary hover:bg-primary/80"
-                  : "bg-primary hover:bg-primary/50"),
-            // has2SessionAfter && "after:content-[''] after:absolute after:left-full after:top-0 after:h-full after:w-[40%] after:bg-secondary/70  after:rounded-sm after:z-0"
-          )}
+        <motion.div
+          className="absolute my-0.5 w-[6.9%] first:ml-0.5"
           style={{
             left: `calc(${startPercent}% - 0px)`,
           }}
-        />
+          initial={{ opacity: 0, scaleX: 0.8 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{
+            duration: 0.25,
+            delay: index * 0.03,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+        >
+          <ProgressPrimitive.Indicator
+            data-slot="progress-indicator"
+            className={cn(
+              "h-2 w-full cursor-pointer rounded-sm transition-all duration-200 hover:shadow-lg",
+              status === "passed" &&
+                "bg-muted-foreground/80 hover:grayscale-0 hover:opacity-100",
+              status === "current" && "z-10 ring-2 ring-offset-1 animate-pulse",
+              status !== "passed" &&
+                (isOnlineSession
+                  ? "bg-secondary hover:bg-secondary/80"
+                  : session.type === "lecture"
+                    ? "bg-primary hover:bg-primary/80"
+                    : "bg-primary hover:bg-primary/50"),
+            )}
+          />
+        </motion.div>
       </HoverCardTrigger>
       <HoverCardContent
         sideOffset={10}
-        className="w-84 rounded-xl border border-border bg-card p-4 text-card-foreground shadow-2xl"
+        className="w-84 rounded-xl border border-border bg-card p-4 text-card-foreground shadow-2xl data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
       >
         <div className="space-y-3">
           <div className="flex items-start justify-between gap-3 border-b border-border/70 pb-3">
@@ -293,20 +302,31 @@ function CurrentTimeIndicator({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <ProgressPrimitive.Indicator
-          data-slot="progress-indicator"
-          className={cn(
-            "absolute top-0 h-full w-0.75 rounded-full z-30 transition-all",
-            "bg-linear-to-b from-red-400 via-red-500 to-red-600",
-            "shadow-[0_0_10px_rgba(239,68,68,0.75)]",
-            "animate-pulse",
-            "hover:w-1.25 hover:shadow-[0_0_16px_rgba(239,68,68,0.95)]",
-          )}
-          style={{ left: `calc(${proportionalValue}% - 2px)` }}
-          title={currentTimeTitle}
+        <motion.div
+          className="absolute top-0 h-full z-30"
+          animate={{ left: `calc(${proportionalValue}% - 2px)` }}
+          transition={{
+            type: "spring",
+            stiffness: 140,
+            damping: 20,
+            mass: 0.5,
+          }}
         >
-          <span className="absolute -top-2 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.9)]" />
-        </ProgressPrimitive.Indicator>
+          <ProgressPrimitive.Indicator
+            data-slot="progress-indicator"
+            className={cn(
+              "absolute top-0 h-full w-0.75 rounded-full z-30 transition-all",
+              "bg-linear-to-b from-red-400 via-red-500 to-red-600",
+              "shadow-[0_0_10px_rgba(239,68,68,0.75)]",
+              "animate-pulse",
+              "hover:w-1.25 hover:shadow-[0_0_16px_rgba(239,68,68,0.95)]",
+            )}
+            style={{ left: `calc(${proportionalValue}% - 2px)` }}
+            title={currentTimeTitle}
+          >
+            <span className="absolute -top-2 left-1/2 -translate-x-1/2 h-2 w-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.9)]" />
+          </ProgressPrimitive.Indicator>
+        </motion.div>
       </TooltipTrigger>
       <TooltipContent className="border p-2 bg-accent rounded">
         <p>
