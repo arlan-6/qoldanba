@@ -93,7 +93,7 @@ const SessionsList = ({
               return (
                 <motion.div
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1}}
+                  animate={{ opacity: 1 }}
                   transition={{
                     duration: 0.65,
                     delay: index * 0.03,
@@ -157,23 +157,39 @@ const SessionsList = ({
         </div>
       ) : (
         <>
-          <div className="m-6">
+          <motion.div
+            initial={{ opacity: 0, x: -35 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              duration: 0.2,
+              ease: "easeInOut",
+            }}
+            className="m-6"
+          >
             <blockquote className="border-l-2 border-yellow-500 pl-6 italic text-muted-foreground">
               No classes scheduled for {isTomorrow ? "tomorrow" : "today"}.
               Enjoy your free time! ;D
             </blockquote>
-          </div>
+          </motion.div>
         </>
       )}
       {/* All passed message */}
       {!isTomorrow &&
         visibleSessions.length > 0 &&
         currentTimePercent > lastSessionEndTime && (
-          <div className="m-6">
+          <motion.div
+            initial={{ opacity: 0, x: -35 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              duration: 0.2,
+              ease: "easeInOut",
+            }}
+            className="m-6"
+          >
             <blockquote className="border-l-2 border-emerald-500 pl-6 italic text-muted-foreground">
               You completed all sessions for today.
             </blockquote>
-          </div>
+          </motion.div>
         )}
     </div>
   );
