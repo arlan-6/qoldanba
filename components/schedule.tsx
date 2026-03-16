@@ -400,7 +400,7 @@ export const Schedule: FC<ScheduleProps> = ({
           </TabsContent>
           <TabsContent value="tomorrow" className=" p-4">
             {/* Tomorrow */}
-            <div className="pt-2">
+            <div className="">
               {/* <h2 className="text-xl mb-0">
                 <span className="text-muted-foreground font-bold shadow-lg">
                   {tomorrowName}
