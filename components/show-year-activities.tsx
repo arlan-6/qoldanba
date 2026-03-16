@@ -2,15 +2,8 @@
 import { Activity } from "./sidebar-calendar";
 import { Calendar } from "./ui/calendar";
 import { Badge } from "./ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent, CardDescription, CardHeader } from "./ui/card";
 import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type Color =
@@ -102,13 +95,6 @@ const colorStyles: Record<Color, { dot: string; badge: string }> = {
   },
 };
 export { colorStyles };
-const termLabels = ["Pre-term", "Fall", "Spring", "Summer"];
-
-function formatDateRange(start: string, end: string) {
-  const formatStableDate = (value: string) =>
-    new Date(value).toISOString().slice(0, 10);
-  return `${formatStableDate(start)} - ${formatStableDate(end)}`;
-}
 
 const YearActivities = ({ activities }: { activities?: Activity[] }) => {
   const safeActivities = activities ?? [];
@@ -135,72 +121,97 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
     setSelectedDate(new Date());
   }, []);
 
+  useEffect(() => {
+    setShowActivities(typeLegend);
+  }, [activities]);
+
   // const activitiesByTerms = termLabels.map((term) =>
   //   activities.filter((activity) => activity.term === term)
   // );
 
   return (
-    <div className="grid gap-6 w-full">
-      <Card className="">
-        <CardHeader className="pb-3 pt-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              {/* <CardTitle className="text-lg">Academic calendar</CardTitle> */}
-              <CardDescription>Key dates and activity ranges</CardDescription>
-            </div>
+    <div className="w-full">
+      <CardHeader className="pb-2 pt-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            {/* <CardTitle className="text-lg">Academic calendar</CardTitle> */}
+            <CardDescription className="text-sm">
+              Key dates and activity ranges
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
             <Badge variant="secondary" className="w-fit">
               {safeActivities.length} activities
             </Badge>
+            {typeLegend.length > 0 && (
+              <button
+                type="button"
+                className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+                onClick={() => setShowActivities(typeLegend)}
+              >
+                Reset filters
+              </button>
+            )}
           </div>
-          {typeLegend.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-2">
-              {typeLegend.map((type) => {
-                const isOn = showActivities.includes(type);
-                const color = colorByType(type);
-                const styles = colorStyles[color];
-                return (
+        </div>
+        {typeLegend.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-2">
+            {typeLegend.map((type) => {
+              const isOn = showActivities.includes(type);
+              const color = colorByType(type);
+              const styles = colorStyles[color];
+              return (
+                <button
+                  type="button"
+                  key={type}
+                  aria-pressed={isOn}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border px-2 py-1 text-xs transition-colors cursor-pointer",
+                    "hover:brightness-110",
+                    !isOn && "opacity-45 grayscale",
+                    styles.badge,
+                  )}
+                  onClick={() => {
+                    if (isOn) {
+                      setShowActivities((prev) =>
+                        prev.filter((t) => t !== type),
+                      );
+                    } else {
+                      setShowActivities((prev) => [...prev, type]);
+                    }
+                  }}
+                >
                   <span
-                    key={type}
                     className={cn(
-                      "inline-flex items-center gap-2 rounded-full border px-2 py-1 text-xs cursor-pointer",
-                      styles.badge
+                      "h-2 w-2 rounded-full ",
+                      isOn ? styles.dot : "opacity-30",
                     )}
-                    onClick={() => {
-                      if (isOn) {
-                        setShowActivities((prev) =>
-                          prev.filter((t) => t !== type)
-                        );
-                      } else {
-                        setShowActivities((prev) => [...prev, type]);
-                      }
-                    }}
-                  >
-                    <span
-                      className={cn(
-                        "h-2 w-2 rounded-full ",
-                        isOn ? styles.dot : "opacity-30"
-                      )}
-                      aria-hidden
-                    />
-                    {type}
-                  </span>
-                );
-              })}
-            </div>
-          )}
-        </CardHeader>
-        <CardContent className="p-2 pt-0 aspect-square md:aspect-auto">
+                    aria-hidden
+                  />
+                  {type}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </CardHeader>
+      <CardContent className="p-2 pt-0 md:p-3 md:pt-0">
+        {safeActivities.length === 0 ? (
+          <div className="rounded-xl border border-dashed bg-muted/20 px-4 py-12 text-center text-sm text-muted-foreground">
+            No academic activities found for this year.
+          </div>
+        ) : (
           <Calendar
-            className="w-full rounded-xl md:border bg-card p-2"
+            className="w-full rounded-xl border bg-card p-2 [--cell-size:2.1rem] md:[--cell-size:2.35rem] lg:[--cell-size:2.6rem]"
             numberOfMonths={
-              device === "desktop" ? 5 : device === "tablet" ? 3 : 1
+              device === "desktop" ? 2 : device === "tablet" ? 1 : 1
             }
             captionLayout="label"
             weekStartsOn={1}
             mode="single"
             selected={selectedDate ?? undefined}
             showOutsideDays={false}
-            onSelect={() => {}}
+            onSelect={(date) => setSelectedDate(date ?? null)}
             modifiers={{
               green: (d) =>
                 safeActivities.some(
@@ -210,22 +221,22 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
                     isInRange(
                       d,
                       new Date(activity.start_date),
-                      new Date(activity.end_date)
-                    )
+                      new Date(activity.end_date),
+                    ),
                 ),
               greenStart: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "green" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.start_date))
+                    isSameDay(d, new Date(activity.start_date)),
                 ),
               greenEnd: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "green" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.end_date))
+                    isSameDay(d, new Date(activity.end_date)),
                 ),
 
               blue: (d) =>
@@ -236,22 +247,22 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
                     isInRange(
                       d,
                       new Date(activity.start_date),
-                      new Date(activity.end_date)
-                    )
+                      new Date(activity.end_date),
+                    ),
                 ),
               blueStart: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "blue" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.start_date))
+                    isSameDay(d, new Date(activity.start_date)),
                 ),
               blueEnd: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "blue" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.end_date))
+                    isSameDay(d, new Date(activity.end_date)),
                 ),
 
               red: (d) =>
@@ -262,22 +273,22 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
                     isInRange(
                       d,
                       new Date(activity.start_date),
-                      new Date(activity.end_date)
-                    )
+                      new Date(activity.end_date),
+                    ),
                 ),
               redStart: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "red" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.start_date))
+                    isSameDay(d, new Date(activity.start_date)),
                 ),
               redEnd: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "red" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.end_date))
+                    isSameDay(d, new Date(activity.end_date)),
                 ),
 
               yellow: (d) =>
@@ -288,22 +299,22 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
                     isInRange(
                       d,
                       new Date(activity.start_date),
-                      new Date(activity.end_date)
-                    )
+                      new Date(activity.end_date),
+                    ),
                 ),
               yellowStart: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "yellow" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.start_date))
+                    isSameDay(d, new Date(activity.start_date)),
                 ),
               yellowEnd: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "yellow" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.end_date))
+                    isSameDay(d, new Date(activity.end_date)),
                 ),
 
               purple: (d) =>
@@ -314,22 +325,22 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
                     isInRange(
                       d,
                       new Date(activity.start_date),
-                      new Date(activity.end_date)
-                    )
+                      new Date(activity.end_date),
+                    ),
                 ),
               purpleStart: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "purple" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.start_date))
+                    isSameDay(d, new Date(activity.start_date)),
                 ),
               purpleEnd: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "purple" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.end_date))
+                    isSameDay(d, new Date(activity.end_date)),
                 ),
 
               pink: (d) =>
@@ -340,22 +351,22 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
                     isInRange(
                       d,
                       new Date(activity.start_date),
-                      new Date(activity.end_date)
-                    )
+                      new Date(activity.end_date),
+                    ),
                 ),
               pinkStart: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "pink" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.start_date))
+                    isSameDay(d, new Date(activity.start_date)),
                 ),
               pinkEnd: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "pink" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.end_date))
+                    isSameDay(d, new Date(activity.end_date)),
                 ),
 
               indigo: (d) =>
@@ -366,22 +377,22 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
                     isInRange(
                       d,
                       new Date(activity.start_date),
-                      new Date(activity.end_date)
-                    )
+                      new Date(activity.end_date),
+                    ),
                 ),
               indigoStart: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "indigo" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.start_date))
+                    isSameDay(d, new Date(activity.start_date)),
                 ),
               indigoEnd: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "indigo" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.end_date))
+                    isSameDay(d, new Date(activity.end_date)),
                 ),
 
               gray: (d) =>
@@ -392,22 +403,22 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
                     isInRange(
                       d,
                       new Date(activity.start_date),
-                      new Date(activity.end_date)
-                    )
+                      new Date(activity.end_date),
+                    ),
                 ),
               grayStart: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "gray" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.start_date))
+                    isSameDay(d, new Date(activity.start_date)),
                 ),
               grayEnd: (d) =>
                 safeActivities.some(
                   (activity) =>
                     colorByType(activity.type) === "gray" &&
                     showActivities.includes(activity.type) &&
-                    isSameDay(d, new Date(activity.end_date))
+                    isSameDay(d, new Date(activity.end_date)),
                 ),
             }}
             modifiersClassNames={{
@@ -442,8 +453,8 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
               grayEnd: "rounded-r-md",
             }}
           />
-        </CardContent>
-      </Card>
+        )}
+      </CardContent>
 
       {/* <div className="flex flex-wrap gap-2">
         {activitiesByTerms.map((termActivities, index) => {
@@ -549,11 +560,7 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
 };
 export default YearActivities;
 
-export function DeviceDetection():
-  | "mobile"
-  | "tablet"
-  | "desktop"
-  | "other" {
+export function DeviceDetection(): "mobile" | "tablet" | "desktop" | "other" {
   if (typeof window === "undefined") return "desktop";
 
   const width = window.innerWidth;

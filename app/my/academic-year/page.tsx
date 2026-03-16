@@ -1,13 +1,6 @@
 import { Activity } from "@/components/sidebar-calendar";
 import { createClient } from "@/lib/supabase/server";
-import {
-  Tabs,
-  TabsContent,
-  TabsContents,
-  TabsList,
-  TabsTrigger,
-} from "@/components/animate-ui/components/animate/tabs";
-import YearActivities from "@/components/show-year-activities";
+import AcademicYearTabs from "@/components/academic-year-tabs";
 
 const AcademicYearPage = async () => {
   const supabase = await createClient();
@@ -23,48 +16,19 @@ const AcademicYearPage = async () => {
 
   const yearActivities = (activities as Activity[]) || [];
 
-  const firstYearActivity = yearActivities.filter(
-    (activity) => activity.course_year === 1
-  );
-  const secondYearActivity = yearActivities.filter(
-    (activity) => activity.course_year === 2
-  );
-  const thirdYearActivity = yearActivities.filter(
-    (activity) => activity.course_year === 3
-  );
-  // const fourthYearActivity = yearActivities.filter(activity => activity.course_year === 4);
-
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold"> Academic Year</h2>
-      <div className="">
-        <Tabs>
-          <TabsList>
-            <TabsTrigger value="firstYear">1st year</TabsTrigger>
-            <TabsTrigger value="secondYear">2nd year</TabsTrigger>
-            <TabsTrigger value="thirdYear">3rd year</TabsTrigger>
-            {/* <TabsTrigger value="fourthYear">4th year</TabsTrigger> */}
-          </TabsList>
-          <TabsContents>
-            <TabsContent value="firstYear">
-             <YearActivities activities={firstYearActivity} />
-            </TabsContent>
-            <TabsContent value="secondYear">
-                <YearActivities activities={secondYearActivity} />
-            </TabsContent>
-            <TabsContent value="thirdYear">
-              <YearActivities activities={thirdYearActivity} />
-            </TabsContent>
-            {/* <TabsContent value="fourthYear">
-              Configure two-factor authentication settings here.
-            </TabsContent> */}
-          </TabsContents>
-        </Tabs>
+    <div className="mx-auto w-full max-w-350 p-4 md:p-6">
+      <div className="mb-4">
+        <h2 className="text-2xl font-semibold tracking-tight">Academic Year</h2>
+        <p className="text-sm text-muted-foreground">
+          Explore academic activities and key dates by course year.
+        </p>
       </div>
+
+      <AcademicYearTabs activities={yearActivities} />
+
       <div className="">
-        <h3>
-            {/* Public and national holidays, carrying the holidays */}
-        </h3>
+        <h3>{/* Public and national holidays, carrying the holidays */}</h3>
       </div>
     </div>
   );
