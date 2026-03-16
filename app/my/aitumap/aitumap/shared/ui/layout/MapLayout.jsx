@@ -28,7 +28,7 @@ const MapLayout = ({ children }) => {
     " ";
 
   return (
-    <TransformWrapper  minScale={0.9} defaultScale={1}>
+    <TransformWrapper  minScale={1} defaultScale={2}>
       <TransformComponent>
         <svg
           // width={width}

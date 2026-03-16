@@ -26,7 +26,7 @@ const MinimapLayout = ({ children }) => {
     : "";
 
   return (
-    <TransformWrapper minScale={0.7} defaultScale={0.7}>
+    <TransformWrapper minScale={1} defaultScale={1}>
       <TransformComponent>
         <svg
           
