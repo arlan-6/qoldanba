@@ -361,10 +361,10 @@ export const Schedule: FC<ScheduleProps> = ({
           </Tooltip>
         </TabsList>
         {/* <TabsContents> */}
-          <TabsContent value="today" className="p-4">
-            {/* Today */}
-            <div>
-              {/* <h2 className="text-xl  mb-0">
+        <TabsContent value="today" className="p-4">
+          {/* Today */}
+          <div>
+            {/* <h2 className="text-xl  mb-0">
                 <span className="text-muted-foreground font-bold shadow-lg">
                   {todayName}
                 </span>
@@ -381,27 +381,27 @@ export const Schedule: FC<ScheduleProps> = ({
                 </p>
               </div> */}
 
-              {/* Time steps */}
-              <TimeSteps daySchedule={todaySessions} />
+            {/* Time steps */}
+            <TimeSteps daySchedule={todaySessions} />
 
-              <Progress
-                value={currentTimePercent}
-                sessions={todaySessions}
-                className="w-full bg-white "
-              />
+            <Progress
+              value={currentTimePercent}
+              sessions={todaySessions}
+              className="w-full bg-white "
+            />
 
-              {/* Classes List */}
-              <SessionsList
-                sessions={todaySessions}
-                currentTimePercent={currentTimePercent}
-                lastSessionEndTime={lastSessionEndTime}
-              />
-            </div>
-          </TabsContent>
-          <TabsContent value="tomorrow" className=" p-4">
-            {/* Tomorrow */}
-            <div className="">
-              {/* <h2 className="text-xl mb-0">
+            {/* Classes List */}
+            <SessionsList
+              sessions={todaySessions}
+              currentTimePercent={currentTimePercent}
+              lastSessionEndTime={lastSessionEndTime}
+            />
+          </div>
+        </TabsContent>
+        <TabsContent value="tomorrow" className=" p-4">
+          {/* Tomorrow */}
+          <div className="">
+            {/* <h2 className="text-xl mb-0">
                 <span className="text-muted-foreground font-bold shadow-lg">
                   {tomorrowName}
                 </span>
@@ -416,45 +416,45 @@ export const Schedule: FC<ScheduleProps> = ({
                 )}
               </p> */}
 
-              {/* Time steps */}
-              <TimeSteps daySchedule={tomorrowSessions} />
+            {/* Time steps */}
+            <TimeSteps daySchedule={tomorrowSessions} />
 
-              <Progress
-                value={0}
-                sessions={tomorrowSessions}
-                className="w-full bg-white "
-                isTomorrow={true}
-              />
-              <SessionsList
-                sessions={tomorrowSessions}
-                currentTimePercent={0}
-                lastSessionEndTime={0}
-                isTomorrow={true}
-              />
-            </div>
-          </TabsContent>
-          <TabsContent value="allWeek" className="p-4 ">
-            <div className="">
-              <h2 className="text-xl mb-0">
-                <span className="text-muted-foreground font-bold shadow-lg">
-                  Week #{weekNumber}
+            <Progress
+              value={0}
+              sessions={tomorrowSessions}
+              className="w-full bg-white "
+              isTomorrow={true}
+            />
+            <SessionsList
+              sessions={tomorrowSessions}
+              currentTimePercent={0}
+              lastSessionEndTime={0}
+              isTomorrow={true}
+            />
+          </div>
+        </TabsContent>
+        <TabsContent value="allWeek" className="p-4 ">
+          <div className="">
+            <h2 className="text-xl mb-0">
+              <span className="text-muted-foreground font-bold shadow-lg">
+                Week #{weekNumber}
+              </span>
+            </h2>
+            <p className="mb-6">
+              {allWeekSessionsCount === 0 ? (
+                <span className="text-muted-foreground">No classes</span>
+              ) : (
+                <span className="text-muted-foreground">
+                  {allWeekSessionsCount} classes in week #{weekNumber}
                 </span>
-              </h2>
-              <p className="mb-6">
-                {allWeekSessionsCount === 0 ? (
-                  <span className="text-muted-foreground">No classes</span>
-                ) : (
-                  <span className="text-muted-foreground">
-                    {allWeekSessionsCount} classes in week #{weekNumber}
-                  </span>
-                )}
-              </p>
-              <ScrollArea className="rounded-lg">
-                <WeekClasses allWeekSessions={allWeekSessions} />
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
-            </div>
-          </TabsContent>
+              )}
+            </p>
+            <ScrollArea className="rounded-lg">
+              <WeekClasses allWeekSessions={allWeekSessions} />
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+        </TabsContent>
         {/* </TabsContents> */}
       </Tabs>
     </div>
