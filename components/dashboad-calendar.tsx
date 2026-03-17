@@ -81,9 +81,9 @@ export default function DashboardCalendar({
   deadlines?: DeadlineLike[];
 }) {
 
-  if (!isMobile){
-    return
-  }
+  // if (!isMobile){
+  //   return
+  // }
   const deadlineCountByDate = React.useMemo(() => {
     return deadlines.reduce<Record<string, number>>((acc, deadline) => {
       if (!deadline?.end_at) return acc;
@@ -159,8 +159,8 @@ export default function DashboardCalendar({
   }, [deadlines]);
 
   return (
-    <div className="mb-6 px-4 sm:px-6">
-      <Card>
+    <div className="px-6 mb-6 aspect-[3/3.35]">
+      <Card className="h-full">
         <CardContent className="p-0">
           <Calendar
             hideNavigation
@@ -168,12 +168,7 @@ export default function DashboardCalendar({
             weekStartsOn={1}
             timeZone="UTC"
             month={calendarMonth}
-            className="w-full bg-transparent [--cell-size:2.35rem] sm:[--cell-size:--spacing(8)]"
-            classNames={{
-              root: "w-full",
-              months: "w-full",
-              month: "w-full",
-            }}
+            className="w-full bg-transparent"
             modifiers={{
               deadlineOne: deadlineModifiers.one,
               deadlineTwo: deadlineModifiers.two,
@@ -199,9 +194,9 @@ export default function DashboardCalendar({
               ),
             }}
           />
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t px-4 py-3 text-xs text-muted-foreground sm:text-sm">
+          <div className="flex items-center justify-end gap-2 border-t px-4 py-3 text-sm text-muted-foreground">
             <span>Deadlines</span>
-            <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1.5">
+            <div className="flex items-center gap-1.5">
               {deadlineLegend.map((item) => (
                 <div key={item.label} className="flex items-center gap-1">
                   <span
