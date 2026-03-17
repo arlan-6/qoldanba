@@ -117,6 +117,7 @@ export async function getDeadlines() {
     .from("deadlines")
     .select("*")
     .eq("user_id", user.id)
+    .gte("end_at", new Date().toISOString())
     .order("end_at", { ascending: true });
 
   if (error) {

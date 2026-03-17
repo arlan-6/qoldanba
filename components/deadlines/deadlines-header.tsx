@@ -8,7 +8,7 @@ interface DeadlinesHeaderProps {
 const DeadlinesHeader = ({ count }: DeadlinesHeaderProps) => {
   return (
     <div className="flex flex-wrap gap-2 md:gap-6 items-end">
-      <h1 className="text-xl font-bold ">Upcoming Deadlines ({count})</h1>
+      <div className="text-xl font-bold ">Upcoming Deadlines ({count})</div>
       <Link
         className="text-sm line-clamp-1 underline"
         href={"https://lms.astanait.edu.kz/my/"}

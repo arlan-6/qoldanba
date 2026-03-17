@@ -1,0 +1,8 @@
+{
+  "debug.javascript.terminalOptions": {
+    "resolveSourceMapLocations": [
+      "${workspaceFolder}/**",
+      "!**/node_modules/**"
+    ]
+  }
+}

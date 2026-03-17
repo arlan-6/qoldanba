@@ -1,8 +1,11 @@
+
 import { createClient } from "@/lib/supabase/server";
 import { Schedule } from "@/components/schedule";
 import { redirect } from "next/navigation";
 import Deadlines from "@/components/dedlines";
 import { Metadata } from "next";
+import DashboardCalendar from "@/components/dashboad-calendar";
+import { getDeadlines } from "@/app/actions/deadlines";
 export const metadata: Metadata = {
   title: "My Dashboard",
   description: "View your schedule and deadlines.",
@@ -27,11 +30,14 @@ export default async function DashboardPage() {
     redirect("/auth/github");
   }
 
+  const deadlines = await getDeadlines();
+
   // console.log(deadlines);
   return (
     <div className="">
       <Schedule group={user.user_metadata?.group} />
-      <Deadlines userId={user.id} icsUrl={user.user_metadata?.icsLink} />
+      <DashboardCalendar deadlines={deadlines} />
+      <Deadlines deadlines={deadlines} />
     </div>
   );
 }
