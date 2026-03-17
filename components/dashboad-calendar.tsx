@@ -81,9 +81,9 @@ export default function DashboardCalendar({
   deadlines?: DeadlineLike[];
 }) {
 
-  // if (!isMobile){
-  //   return
-  // }
+  if (!isMobile){
+    return
+  }
   const deadlineCountByDate = React.useMemo(() => {
     return deadlines.reduce<Record<string, number>>((acc, deadline) => {
       if (!deadline?.end_at) return acc;
