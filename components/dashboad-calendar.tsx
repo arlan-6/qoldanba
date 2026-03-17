@@ -20,22 +20,28 @@ const toUtcDateKey = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-const getDeadlineCountBadgeClassName = (count: number) => {
-  if (count >= 4) {
-    return "bg-red-500 text-white shadow-red-950/30";
-  }
-
-  if (count >= 2) {
-    return "bg-amber-400 text-amber-950 shadow-amber-950/20";
-  }
-
-  return "bg-blue-500 text-white shadow-blue-950/30";
-};
-
-const formatDeadlineCount = (count: number) => {
-  if (count > 9) return "9+";
-  return String(count);
-};
+const deadlineLegend = [
+  {
+    label: "1",
+    className:
+      "border-sky-500/30 bg-sky-500/20 dark:border-sky-400/30 dark:bg-sky-400/15",
+  },
+  {
+    label: "2",
+    className:
+      "border-teal-500/30 bg-teal-500/20 dark:border-teal-400/30 dark:bg-teal-400/15",
+  },
+  {
+    label: "3",
+    className:
+      "border-amber-500/35 bg-amber-500/20 dark:border-amber-400/30 dark:bg-amber-400/15",
+  },
+  {
+    label: "4+",
+    className:
+      "border-rose-500/35 bg-rose-500/20 dark:border-rose-400/30 dark:bg-rose-400/15",
+  },
+] as const;
 
 function DashboardCalendarDay({
   day,
@@ -57,16 +63,6 @@ function DashboardCalendarDay({
           : ariaLabel
       }
     >
-      {count ? (
-        <span
-          className={cn(
-            "  pointer-events-none absolute -right-1.5 -top-1 z-50 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-background px-0.5 py-0.5 text-[6px] leading-none shadow-md bg-accent",
-            getDeadlineCountBadgeClassName(count)
-          )}
-        >
-          {formatDeadlineCount(count)}
-        </span>
-      ) : null}
       <div
         className={cn(
           "dashboard-calendar-day flex h-full min-h-[var(--cell-size)] w-full flex-col items-center justify-center rounded-md border border-transparent bg-muted/20 px-1 py-1 transition-colors"
@@ -97,30 +93,36 @@ export default function DashboardCalendar({
   }, [deadlines]);
 
   const deadlineModifiers = React.useMemo(() => {
-    const low: Date[] = [];
-    const medium: Date[] = [];
-    const high: Date[] = [];
+    const one: Date[] = [];
+    const two: Date[] = [];
+    const three: Date[] = [];
+    const fourPlus: Date[] = [];
 
     Object.entries(deadlineCountByDate).forEach(([key, count]) => {
       const [year, month, day] = key.split("-").map(Number);
       const date = new Date(Date.UTC(year, month - 1, day));
 
       if (count >= 4) {
-        high.push(date);
+        fourPlus.push(date);
         return;
       }
 
-      if (count >= 2) {
-        medium.push(date);
+      if (count === 3) {
+        three.push(date);
         return;
       }
 
-      if (count >= 1) {
-        low.push(date);
+      if (count === 2) {
+        two.push(date);
+        return;
+      }
+
+      if (count === 1) {
+        one.push(date);
       }
     });
 
-    return { low, medium, high };
+    return { one, two, three, fourPlus };
   }, [deadlineCountByDate]);
 
   const calendarMonth = React.useMemo(() => {
@@ -163,16 +165,19 @@ export default function DashboardCalendar({
             month={calendarMonth}
             className="w-full bg-transparent"
             modifiers={{
-              deadlineLow: deadlineModifiers.low,
-              deadlineMedium: deadlineModifiers.medium,
-              deadlineHigh: deadlineModifiers.high,
+              deadlineOne: deadlineModifiers.one,
+              deadlineTwo: deadlineModifiers.two,
+              deadlineThree: deadlineModifiers.three,
+              deadlineFourPlus: deadlineModifiers.fourPlus,
             }}
             modifiersClassNames={{
-              deadlineLow:
+              deadlineOne:
                 "[&>.dashboard-calendar-day]:border-sky-500/30 [&>.dashboard-calendar-day]:bg-sky-500/20 [&>.dashboard-calendar-day]:text-sky-950 dark:[&>.dashboard-calendar-day]:border-sky-400/30 dark:[&>.dashboard-calendar-day]:bg-sky-400/15 dark:[&>.dashboard-calendar-day]:text-sky-100",
-              deadlineMedium:
+              deadlineTwo:
+                "[&>.dashboard-calendar-day]:border-teal-500/30 [&>.dashboard-calendar-day]:bg-teal-500/20 [&>.dashboard-calendar-day]:text-teal-950 dark:[&>.dashboard-calendar-day]:border-teal-400/30 dark:[&>.dashboard-calendar-day]:bg-teal-400/15 dark:[&>.dashboard-calendar-day]:text-teal-100",
+              deadlineThree:
                 "[&>.dashboard-calendar-day]:border-amber-500/35 [&>.dashboard-calendar-day]:bg-amber-500/20 [&>.dashboard-calendar-day]:text-amber-950 dark:[&>.dashboard-calendar-day]:border-amber-400/30 dark:[&>.dashboard-calendar-day]:bg-amber-400/15 dark:[&>.dashboard-calendar-day]:text-amber-100",
-              deadlineHigh:
+              deadlineFourPlus:
                 "[&>.dashboard-calendar-day]:border-rose-500/35 [&>.dashboard-calendar-day]:bg-rose-500/20 [&>.dashboard-calendar-day]:text-rose-950 dark:[&>.dashboard-calendar-day]:border-rose-400/30 dark:[&>.dashboard-calendar-day]:bg-rose-400/15 dark:[&>.dashboard-calendar-day]:text-rose-100",
             }}
             components={{
@@ -184,6 +189,20 @@ export default function DashboardCalendar({
               ),
             }}
           />
+          <div className="flex items-center justify-end gap-2 border-t px-4 py-3 text-sm text-muted-foreground">
+            <span>Deadlines</span>
+            <div className="flex items-center gap-1.5">
+              {deadlineLegend.map((item) => (
+                <div key={item.label} className="flex items-center gap-1">
+                  <span
+                    className={cn("h-3.5 w-3.5 rounded-[4px] border", item.className)}
+                    aria-hidden
+                  />
+                  <span>{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
