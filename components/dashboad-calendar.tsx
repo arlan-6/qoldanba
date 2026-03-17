@@ -161,7 +161,7 @@ export default function DashboardCalendar({
   return (
     <div className="px-6 mb-6 aspect-[3/3.35]">
       <Card className="h-full">
-        <CardContent className="p-0">
+        <CardContent className="p-0 h-full flex justify-between flex-col">
           <Calendar
             hideNavigation
             showOutsideDays={false}
@@ -194,13 +194,16 @@ export default function DashboardCalendar({
               ),
             }}
           />
-          <div className="flex items-center justify-end gap-2 border-t px-4 py-3 text-sm text-muted-foreground">
+          <div className="relative bottom-0 flex items-center justify-end gap-2 border-t px-4 py-3 text-sm text-muted-foreground">
             <span>Deadlines</span>
             <div className="flex items-center gap-1.5">
               {deadlineLegend.map((item) => (
                 <div key={item.label} className="flex items-center gap-1">
                   <span
-                    className={cn("h-3.5 w-3.5 rounded-[4px] border", item.className)}
+                    className={cn(
+                      "h-3.5 w-3.5 rounded-[4px] border",
+                      item.className,
+                    )}
                     aria-hidden
                   />
                   <span>{item.label}</span>
