@@ -4,6 +4,7 @@ import { Card, CardContent } from "./ui/card";
 import { Calendar } from "./ui/calendar";
 import { cn } from "@/lib/utils";
 import type { DayProps } from "react-day-picker";
+import { isMobile } from "mobile-device-detect";
 
 type DeadlineLike = {
   end_at?: string | null;
@@ -79,6 +80,10 @@ export default function DashboardCalendar({
 }: {
   deadlines?: DeadlineLike[];
 }) {
+
+  if (!isMobile){
+    return
+  }
   const deadlineCountByDate = React.useMemo(() => {
     return deadlines.reduce<Record<string, number>>((acc, deadline) => {
       if (!deadline?.end_at) return acc;
@@ -154,7 +159,7 @@ export default function DashboardCalendar({
   }, [deadlines]);
 
   return (
-    <div className="px-6 mb-6">
+    <div className="mb-6 px-4 sm:px-6">
       <Card>
         <CardContent className="p-0">
           <Calendar
@@ -163,7 +168,12 @@ export default function DashboardCalendar({
             weekStartsOn={1}
             timeZone="UTC"
             month={calendarMonth}
-            className="w-full bg-transparent"
+            className="w-full bg-transparent [--cell-size:2.35rem] sm:[--cell-size:--spacing(8)]"
+            classNames={{
+              root: "w-full",
+              months: "w-full",
+              month: "w-full",
+            }}
             modifiers={{
               deadlineOne: deadlineModifiers.one,
               deadlineTwo: deadlineModifiers.two,
@@ -189,9 +199,9 @@ export default function DashboardCalendar({
               ),
             }}
           />
-          <div className="flex items-center justify-end gap-2 border-t px-4 py-3 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t px-4 py-3 text-xs text-muted-foreground sm:text-sm">
             <span>Deadlines</span>
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1.5">
               {deadlineLegend.map((item) => (
                 <div key={item.label} className="flex items-center gap-1">
                   <span
