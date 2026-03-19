@@ -61,7 +61,9 @@ const DeadlinesCard = ({
         key={deadline.id}
         className={cn(
           "flex transition-all hover:bg-accent/50 group",
-          viewType === "card" ? "flex-col" : "flex-row items-center rounded-sm",
+          viewType === "card"
+            ? "flex-col"
+            : "flex-row  items-center rounded-sm",
           dueSoon && "border-blue-500/50",
           dueNow && "border-destructive/50",
           isProccessing && "animate-pulse grayscale-75",

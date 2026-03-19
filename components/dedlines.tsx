@@ -140,11 +140,14 @@ const Deadlines = ({ deadlines = [] }: { deadlines?: any[] }) => {
         className={cn(
           viewType === "card"
             ? "grid gap-3 md:grid-cols-2 lg:grid-cols-4"
-            : "grid lg:grid-cols-2 gap-2",
+            : "grid md:grid-cols-3 lg:grid-cols-5 gap-2",
         )}
       >
         <div
-          className={cn(viewType === "card" && "col-span-1 row-span-3 ")}
+          className={cn(
+            viewType === "card" && "col-span-1 row-span-3 ",
+            viewType === "list" && "col-span-1 lg:row-span-10 md:row-span-6",
+          )}
         >
           <DashboardCalendar deadlines={filteredDeadlines} />
         </div>
@@ -160,7 +163,12 @@ const Deadlines = ({ deadlines = [] }: { deadlines?: any[] }) => {
 
               return (
                 <ContextMenu key={deadline.id}>
-                  <ContextMenuTrigger>
+                  <ContextMenuTrigger
+                    className={cn(
+                      viewType == "list" &&
+                        "md:col-span-2 lg:col-span-2 lg:row-span-1",
+                    )}
+                  >
                     <DeadlinesCard
                       isProccessing={processingId == deadline.id}
                       deadline={deadline}
