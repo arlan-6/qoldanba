@@ -3,8 +3,8 @@ import React from "react";
 import { Card, CardContent } from "./ui/card";
 import { Calendar } from "./ui/calendar";
 import { cn } from "@/lib/utils";
-import type { DayProps } from "react-day-picker";
-import { isMobile } from "mobile-device-detect";
+import type { DateRange, DayProps, OnSelectHandler } from "react-day-picker";
+import { X } from "lucide-react";
 
 type DeadlineLike = {
   end_at?: string | null;
@@ -35,7 +35,7 @@ const deadlineLegend = [
   {
     label: "3",
     className:
-      "border-amber-500/35 bg-amber-500/20 dark:border-amber-400/30 dark:bg-amber-400/15",
+      "border-fuchsia-500/35 bg-fuchsia-500/20 dark:border-fuchsia-400/30 dark:bg-fuchsia-400/15",
   },
   {
     label: "4+",
@@ -66,10 +66,11 @@ function DashboardCalendarDay({
     >
       <div
         className={cn(
-          "dashboard-calendar-day flex h-full min-h-[var(--cell-size)] w-full flex-col items-center justify-center rounded-md border border-transparent bg-muted/20 px-1 py-1 transition-colors"
+          "  dashboard-calendar-day flex h-full min-h-[var(--cell-size)] w-full flex-col items-center justify-center rounded-md border border-transparent transition-colors",
+          " ",
         )}
       >
-        <span className="leading-none">{children}</span>
+        <span className="leading-none bg-black/0">{children}</span>
       </div>
     </td>
   );
@@ -77,9 +78,16 @@ function DashboardCalendarDay({
 
 export default function DashboardCalendar({
   deadlines = [],
+  selectedRange,
+  setSelectedRange,
 }: {
   deadlines?: DeadlineLike[];
+  selectedRange: DateRange | undefined;
+  setSelectedRange: (dateRange: DateRange | undefined) => void;
 }) {
+  // const [selectedRange, setSelectedRange] = React.useState<
+  //   DateRange | undefined
+  // >();
 
   // if (!isMobile){
   //   return
@@ -158,17 +166,29 @@ export default function DashboardCalendar({
     );
   }, [deadlines]);
 
+  const handleSelect: OnSelectHandler<DateRange | undefined> = (dateRange) => {
+    setSelectedRange(dateRange);
+  };
+
   return (
-    <div className="aspect-[3/4]">
+    <div className="aspect-3/4">
       <Card className="h-full">
         <CardContent className="p-0 h-full flex justify-between flex-col">
           <Calendar
-            hideNavigation
+            mode="range"
+            onSelect={handleSelect}
+            selected={selectedRange}
             showOutsideDays={false}
             weekStartsOn={1}
             timeZone="UTC"
-            month={calendarMonth}
+            // month={calendarMonth}
             className="w-full bg-transparent"
+            classNames={{
+              selected: ` border-b-2  border-amber-500/50 text-white`, // Highlight the selected day
+              root: `  shadow-lg`,
+              chevron: `  fill-amber-500 `,
+              today: `border-amber-500/60 bg-amber-500/30 border-2 rounded-md`,
+            }}
             modifiers={{
               deadlineOne: deadlineModifiers.one,
               deadlineTwo: deadlineModifiers.two,
@@ -189,16 +209,34 @@ export default function DashboardCalendar({
               Day: (props) => (
                 <DashboardCalendarDay
                   {...props}
+                  // className="hover:bg-red-500"
                   deadlineCountByDate={deadlineCountByDate}
                 />
               ),
             }}
           />
-          <div className="relative bottom-0 flex items-center justify-end gap-2 border-t px-4 py-3 text-sm text-muted-foreground">
+          {selectedRange && (
+            <div className="text-xs w-full flex items-center justify-center gap-4 bg-amber-500/50 px-4 py-1">
+              {selectedRange.from
+                ? `${String(selectedRange.from.getDate()).padStart(2, "0")}.${String(selectedRange.from.getMonth() + 1).padStart(2, "0")}.${selectedRange.from.getFullYear()}`
+                : ""}{" "}
+              -{" "}
+              {selectedRange.to
+                ? `${String(selectedRange.to.getDate()).padStart(2, "0")}.${String(selectedRange.to.getMonth() + 1).padStart(2, "0")}.${selectedRange.to.getFullYear()}`
+                : ""}
+              <span
+                className="bg-accent p-1 rounded-2xl cursor-pointer "
+                onClick={() => setSelectedRange(undefined)}
+              >
+                <X size={16} />
+              </span>
+            </div>
+          )}
+          <div className="relative bottom-0 flex items-center justify-end gap-2 border-t px-4 py-1 pb-3 text-sm text-muted-foreground">
             <span>Deadlines</span>
             <div className="flex items-center gap-1.5">
               {deadlineLegend.map((item) => (
-                <div key={item.label} className="flex items-center gap-1">
+                <div key={item.label} className="flex items-center gap-1  ">
                   <span
                     className={cn(
                       "h-3.5 w-3.5 rounded-[4px] border",

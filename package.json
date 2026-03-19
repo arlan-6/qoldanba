@@ -52,12 +52,13 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/web-push": "^3.6.4",
+    "baseline-browser-mapping": "^2.10.9",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
     "postcss": "^8",
     "tailwindcss": "^4.1.18",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5",
-    "wrangler": "^3.78.0"
+    "wrangler": "^4.75.0"
   }
 }
