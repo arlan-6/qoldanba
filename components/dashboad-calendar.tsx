@@ -159,7 +159,7 @@ export default function DashboardCalendar({
   }, [deadlines]);
 
   return (
-    <div className=" ">
+    <div className="aspect-[3/4]">
       <Card className="h-full">
         <CardContent className="p-0 h-full flex justify-between flex-col">
           <Calendar
