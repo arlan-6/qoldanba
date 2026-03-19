@@ -35,8 +35,8 @@ export default async function DashboardPage() {
   // console.log(deadlines);
   return (
     <div className="">
-      <Schedule group={user.user_metadata?.group} />
-      <DashboardCalendar deadlines={deadlines} />
+       <Schedule group={user.user_metadata?.group} />
+     {/* <DashboardCalendar deadlines={deadlines} /> */}
       <Deadlines deadlines={deadlines} />
     </div>
   );

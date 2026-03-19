@@ -150,3 +150,49 @@ export async function updateDeadline(id: string, updates: any) {
   revalidatePath("/my");
   return { success: true };
 }
+
+export async function hideDeadline(id: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const { error } = await supabase
+    .from("deadlines")
+    .update({ hidden: true })
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Error hiding deadline:", error);
+    throw new Error("Failed to hide deadline");
+  }
+
+  revalidatePath("/my");
+  return { success: true };
+}
+
+export async function UnhideDeadline(id: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const { error } = await supabase
+    .from("deadlines")
+    .update({ hidden: false })
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Error unhiding deadline:", error);
+    throw new Error("Failed to unhide deadline");
+  }
+
+  revalidatePath("/my");
+  return { success: true };
+}

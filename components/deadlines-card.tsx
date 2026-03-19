@@ -13,13 +13,21 @@ import { cn } from "@/lib/utils";
 import { format, set } from "date-fns";
 import { AlertOctagon, Calendar, Clock, Flag, User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { ContextMenuTrigger } from "./ui/context-menu";
 
 interface DeadlinesCardProps {
   deadline: any;
   viewType: "card" | "list";
+  isProccessing: boolean;
+  isHidden: boolean;
 }
 
-const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
+const DeadlinesCard = ({
+  deadline,
+  viewType,
+  isProccessing,
+  isHidden = false,
+}: DeadlinesCardProps) => {
   if (!deadline) return null;
   const [, setTick] = useState(0);
   const endAt = deadline.end_at ? new Date(deadline.end_at) : null;
@@ -47,19 +55,23 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
       key={deadline.id}
       // className={cn(dayCountUntillToday(new Date(deadline.end_at), 1) && "shadow-2xl")}
     >
+      {" "}
+      {/* <ContextMenuTrigger>Right click here</ContextMenuTrigger> */}
       <Card
         key={deadline.id}
         className={cn(
           "flex transition-all hover:bg-accent/50 group",
           viewType === "card" ? "flex-col" : "flex-row items-center rounded-sm",
           dueSoon && "border-blue-500/50",
-          dueNow && "border-destructive/50"
+          dueNow && "border-destructive/50",
+          isProccessing && "animate-pulse grayscale-75",
+          isHidden && "grayscale-75",
         )}
       >
         <CardHeader
           className={cn(
             " p-2 px-4 pt-3",
-            viewType === "list" ? "p-2 py-0 flex-1 " : ""
+            viewType === "list" ? "p-2 py-0 flex-1 " : "",
           )}
         >
           <div
@@ -67,19 +79,19 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
               "flex gap-2",
               viewType === "list"
                 ? "items-center mb-0"
-                : "justify-between items-start"
+                : "justify-between items-start",
             )}
           >
             <div
               className={cn(
                 "flex gap-2 w-full",
-                viewType === "list" ? "items-center" : "flex-col items-start"
+                viewType === "list" ? "items-center" : "flex-col items-start",
               )}
             >
               <CardTitle
                 className={cn(
                   "leading-tight  flex items-start w-full justify-between",
-                  viewType === "list" ? "text-sm ml-1" : "text-sm mt-0"
+                  viewType === "list" ? "text-sm ml-1" : "text-sm mt-0",
                 )}
               >
                 {deadline.subject}
@@ -98,7 +110,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
           <CardDescription
             className={cn(
               "line-clamp-2 text-xs",
-              viewType === "list" ? "mt-1" : ""
+              viewType === "list" ? "mt-1" : "",
             )}
           >
             {deadline.title}
@@ -107,7 +119,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
         <CardContent
           className={cn(
             "flex-1",
-            viewType === "list" ? "p-2 flex-none w-50 md:w-75" : "pb-3"
+            viewType === "list" ? "p-2 flex-none w-50 md:w-75" : "pb-3",
           )}
         >
           <div
@@ -115,7 +127,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
               "flex text-sm text-muted-foreground",
               viewType === "list"
                 ? "flex-col items-end gap-1"
-                : "flex-col gap-1"
+                : "flex-col gap-1",
             )}
           >
             {deadline.lecturer && viewType === "card" && (
@@ -127,7 +139,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
             <div
               className={cn(
                 "flex gap-4",
-                viewType === "list" ? "items-center" : "justify-between w-full"
+                viewType === "list" ? "items-center" : "justify-between w-full",
               )}
             >
               <div className="flex items-center gap-2 text-xs">
@@ -142,7 +154,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
             <div
               className={cn(
                 "w-full pt-2",
-                viewType === "card" ? "border-t-2" : ""
+                viewType === "card" ? "border-t-2" : "",
               )}
             >
               <div
@@ -151,8 +163,8 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
                   viewType === "list"
                     ? "justify-end"
                     : dueNow || dueSoon
-                    ? "justify-between"
-                    : "justify-end"
+                      ? "justify-between"
+                      : "justify-end",
                 )}
               >
                 {dueNow ? (
@@ -178,7 +190,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
                 <span
                   className={cn(
                     viewType === "list" && "text-sm ml-4 ",
-                    "text-accent-foreground"
+                    "text-accent-foreground",
                   )}
                 >
                   {daysUntil ?? "TBD"}
@@ -193,7 +205,7 @@ const DeadlinesCard = ({ deadline, viewType }: DeadlinesCardProps) => {
 };
 
 function getBadgeVariant(
-  type: string
+  type: string,
 ): "default" | "secondary" | "destructive" | "outline" {
   switch (type?.toLowerCase()) {
     case "exam":
