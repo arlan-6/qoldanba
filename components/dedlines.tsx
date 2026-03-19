@@ -117,7 +117,7 @@ const Deadlines = ({ deadlines = [] }: { deadlines?: any[] }) => {
   };
 
   return (
-    <div className="p-6 pt-2 select-none md:select-all">
+    <div className="p-6 pt-2 select-none md:select-auto">
       <div className="flex flex-wrap items-center justify-between mb-4">
         <DeadlinesHeader count={filteredDeadlines.length} />
 
