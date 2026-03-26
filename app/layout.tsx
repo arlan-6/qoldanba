@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import Script from "next/script";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next";
@@ -76,9 +77,10 @@ export default function RootLayout({
     <html lang="kz" suppressHydrationWarning>
       <head>
         {process.env.NODE_ENV === "development" && (
-          <script
+          <Script
             crossOrigin="anonymous"
             src="//unpkg.com/react-scan/dist/auto.global.js"
+            strategy="afterInteractive"
           />
         )}
       </head>

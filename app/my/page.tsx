@@ -1,4 +1,3 @@
-
 import { createClient } from "@/lib/supabase/server";
 import { Schedule } from "@/components/schedule";
 import { redirect } from "next/navigation";
@@ -35,9 +34,12 @@ export default async function DashboardPage() {
   // console.log(deadlines);
   return (
     <div className="">
-       <Schedule group={user.user_metadata?.group} />
-     {/* <DashboardCalendar deadlines={deadlines} /> */}
-      <Deadlines deadlines={deadlines} />
+      <Schedule group={user.user_metadata?.group} />
+      {/* <DashboardCalendar deadlines={deadlines} /> */}
+      <Deadlines
+        deadlines={deadlines}
+        icsUrl={user.user_metadata?.icsLink || ""}
+      />
     </div>
   );
 }

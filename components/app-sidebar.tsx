@@ -143,6 +143,7 @@ export async function AppSidebar({
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
+                  value="nav-profile"
                   tooltip={fullName}
                   isActive={currentUrl === "/my/profile"}
                   className="h-8 rounded-lg"
@@ -174,6 +175,7 @@ export async function AppSidebar({
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
+                      value="nav-dashboard"
                       tooltip="Dashboard"
                       isActive={currentUrl === "/my"}
                     >
@@ -187,6 +189,7 @@ export async function AppSidebar({
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
+                      value="nav-links"
                       tooltip="Links"
                       isActive={currentUrl.startsWith("/my/links")}
                     >
@@ -200,6 +203,7 @@ export async function AppSidebar({
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
+                      value="nav-map"
                       tooltip="Map"
                       isActive={currentUrl.startsWith("/my/aitumap")}
                     >
@@ -213,6 +217,7 @@ export async function AppSidebar({
                   <SidebarMenuItem>
                     <SidebarMenuButton
                       asChild
+                      value="nav-academic-year"
                       tooltip="Academic year"
                       isActive={currentUrl.startsWith("/my/academic-year")}
                     >
@@ -242,6 +247,7 @@ export async function AppSidebar({
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
+                value="nav-support-telegram"
                 tooltip="Questions?"
                 className="h-10 rounded-lg"
               >

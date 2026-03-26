@@ -13,7 +13,11 @@ import {
   ContextMenuTrigger,
 } from "./ui/context-menu";
 import { Eye, EyeOff } from "lucide-react";
-import { hideDeadline, UnhideDeadline } from "@/app/actions/deadlines";
+import {
+  hideDeadline,
+  syncDeadlines,
+  UnhideDeadline,
+} from "@/app/actions/deadlines";
 import { toast } from "sonner";
 import HiddenDeadlinesToggle from "./deadlines/hidden-deadlines-toggle";
 import DashboardCalendar from "./dashboad-calendar";
@@ -22,7 +26,16 @@ import { DateRange } from "react-day-picker";
 const toUtcDayKey = (date: Date) =>
   Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 
-const Deadlines = ({ deadlines = [] }: { deadlines?: any[] }) => {
+const EMPTY_DEADLINES: any[] = [];
+
+const Deadlines = ({
+  deadlines,
+  icsUrl = "",
+}: {
+  deadlines?: any[];
+  icsUrl?: string;
+}) => {
+  const incomingDeadlines = deadlines ?? EMPTY_DEADLINES;
   const [showExams, setShowExams] = React.useState(true);
   const [showAssignments, setShowAssignments] = React.useState(true);
   const [showQuizzes, setShowQuizzes] = React.useState(true);
@@ -33,10 +46,35 @@ const Deadlines = ({ deadlines = [] }: { deadlines?: any[] }) => {
   const [selectedRange, setSelectedRange] = React.useState<
     DateRange | undefined
   >();
+  const [syncedDeadlines, setSyncedDeadlines] = React.useState<any[] | null>(
+    null,
+  );
   const [hiddenOverrides, setHiddenOverrides] = React.useState<
     Record<string, boolean>
   >({});
-  const effectiveDeadlines = deadlines;
+
+  const effectiveDeadlines = syncedDeadlines ?? incomingDeadlines;
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const syncInBackground = async () => {
+      if (!icsUrl) return;
+
+      const result = await syncDeadlines(icsUrl, false);
+
+      if (!isMounted || result?.error) return;
+      if (Array.isArray(result.deadlines)) {
+        setSyncedDeadlines(result.deadlines);
+      }
+    };
+
+    void syncInBackground();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [icsUrl]);
 
   if (!effectiveDeadlines || effectiveDeadlines.length === 0) {
     return (
