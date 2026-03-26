@@ -5,6 +5,7 @@ import Deadlines from "@/components/dedlines";
 import { Metadata } from "next";
 import DashboardCalendar from "@/components/dashboad-calendar";
 import { getDeadlines } from "@/app/actions/deadlines";
+import LearmRemineder from "@/components/learn-remineder";
 export const metadata: Metadata = {
   title: "My Dashboard",
   description: "View your schedule and deadlines.",
@@ -34,12 +35,14 @@ export default async function DashboardPage() {
   // console.log(deadlines);
   return (
     <div className="">
+      <LearmRemineder />
       <Schedule group={user.user_metadata?.group} />
       {/* <DashboardCalendar deadlines={deadlines} /> */}
       <Deadlines
         deadlines={deadlines}
         icsUrl={user.user_metadata?.icsLink || ""}
       />
+
     </div>
   );
 }
