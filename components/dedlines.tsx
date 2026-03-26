@@ -190,7 +190,7 @@ const Deadlines = ({
       <div
         className={cn(
           viewType === "card"
-            ? "grid gap-3 md:grid-cols-2 lg:grid-cols-4"
+            ? "grid gap-3 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2"
             : "grid md:grid-cols-3 lg:grid-cols-5 gap-2",
         )}
       >
