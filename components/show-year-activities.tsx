@@ -195,14 +195,14 @@ const YearActivities = ({ activities }: { activities?: Activity[] }) => {
           </div>
         )}
       </CardHeader>
-      <CardContent className="p-2 pt-0 md:p-3 md:pt-0">
+      <CardContent className="p-2 mb:20 pt-0 md:p-3 md:pt-0">
         {safeActivities.length === 0 ? (
-          <div className="rounded-xl border border-dashed bg-muted/20 px-4 py-12 text-center text-sm text-muted-foreground">
+          <div className="rounded-xl mb-20 md:mb-6 border-dashed bg-muted/20 px-4 py-12 text-center text-sm text-muted-foreground">
             No academic activities found for this year.
           </div>
         ) : (
           <Calendar
-            className="w-full rounded-xl border bg-card p-2 [--cell-size:2.1rem] md:[--cell-size:2.35rem] lg:[--cell-size:2.6rem]"
+            className="w-full rounded-xl  mb-20 md:mb-6 bg-card p-2 [--cell-size:2.1rem] md:[--cell-size:2.35rem] lg:[--cell-size:2.6rem]"
             numberOfMonths={
               device === "desktop" ? 2 : device === "tablet" ? 1 : 1
             }
