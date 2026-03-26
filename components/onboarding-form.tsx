@@ -23,6 +23,9 @@ export function OnboardingForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const GROUP_REGEX = /^[A-Z]{2,5}-[0-9]{4}$/;
+  const GROUP_INPUT_REGEX = /^[A-Z0-9-]*$/;
+
   const [group, setGroup] = useState("");
   const [icsLink, setIcsLink] = useState("");
   const [degreeProgram, setDegreeProgram] = useState("");
@@ -30,14 +33,28 @@ export function OnboardingForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  const handleGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const nextValue = e.target.value.toUpperCase();
 
+    if (
+      (GROUP_INPUT_REGEX.test(nextValue) || nextValue === "") &&
+      nextValue.length <= 10
+    ) {
+      setGroup(nextValue);
+    }
+  };
 
-  
   const handleOnboarding = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
+
+    if (!GROUP_REGEX.test(group)) {
+      setError("Group must be in format BDA-2506");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const { error } = await supabase.auth.updateUser({
@@ -75,11 +92,20 @@ export function OnboardingForm({
                   type="text"
                   required
                   value={group}
-                  onChange={(e) => setGroup(e.target.value)}
+                  onChange={handleGroupChange}
                   placeholder="BDA-2506"
-                  pattern="[A-Z]{2,5}-\d{4}"
-                  title="Group should be in format BDA-2506"
+                  pattern="[A-Z]{2,5}-[0-9]{4}"
+                  title="Use format BDA-2506"
+                  maxLength={10}
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  aria-describedby="group-help"
                 />
+                <p id="group-help" className="text-xs text-muted-foreground">
+                  Format: 2 to 5 uppercase letters, dash, 4 digits (example:
+                  BDA-2506)
+                </p>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="degree-program">Degree Program</Label>
@@ -91,23 +117,14 @@ export function OnboardingForm({
                   className="flex h-10 rounded-md border border-input bg-accent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="">Select a degree program</option>
-                  <option value="Bachelor">
-                    Bachelor degree
-                  </option>
-                  <option value="Master">
-                    Master degree
-                  </option>
-                  <option value="Phd">
-                    Phd degree
-                  </option>
+                  <option value="Bachelor">Bachelor degree</option>
+                  <option value="Master">Master degree</option>
+                  <option value="Phd">Phd degree</option>
                 </select>
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="ics-link">
-                  ICS Link
-                  
-                </Label>
+                <Label htmlFor="ics-link">ICS Link</Label>
                 <Input
                   id="ics-link"
                   type="text"
