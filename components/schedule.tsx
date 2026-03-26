@@ -385,17 +385,19 @@ export const Schedule: FC<ScheduleProps> = ({
           </Tooltip>
         </TabsList>
         {/* <TabsContents> */}
-        <TabsContent value="today" className="p-4">
+        <TabsContent value="today" className="">
           {/* Today */}
-          <div>
+          <div className="mb-4">
             {/* Time steps */}
-            <TimeSteps daySchedule={todaySessions} />
+            <div className="px-4 pt-4">
+              <TimeSteps daySchedule={todaySessions} />
 
-            <Progress
-              value={currentTimePercent}
-              sessions={todaySessions}
-              className="w-full bg-white "
-            />
+              <Progress
+                value={currentTimePercent}
+                sessions={todaySessions}
+                className="w-full bg-white "
+              />
+            </div>
 
             {/* Classes List */}
             <SessionsList
@@ -405,18 +407,20 @@ export const Schedule: FC<ScheduleProps> = ({
             />
           </div>
         </TabsContent>
-        <TabsContent value="tomorrow" className=" p-4">
+        <TabsContent value="tomorrow" className="">
           {/* Tomorrow */}
-          <div className="">
+          <div className="mb-4">
             {/* Time steps */}
-            <TimeSteps daySchedule={tomorrowSessions} />
+            <div className="px-4 pt-4">
+              <TimeSteps daySchedule={tomorrowSessions} />
 
-            <Progress
-              value={0}
-              sessions={tomorrowSessions}
-              className="w-full bg-white "
-              isTomorrow={true}
-            />
+              <Progress
+                value={0}
+                sessions={tomorrowSessions}
+                className="w-full bg-white "
+                isTomorrow={true}
+              />
+            </div>
             <SessionsList
               sessions={tomorrowSessions}
               currentTimePercent={0}
