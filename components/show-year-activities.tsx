@@ -31,8 +31,8 @@ function isSameDay(a: Date, b: Date) {
 
 function colorByType(type: string): Color {
   switch (type) {
-    case "study":
-      return "gray";
+    // case "study":
+    //   return "gray";
     case "registration":
       return "blue";
     case "midterm":
