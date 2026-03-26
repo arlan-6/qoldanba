@@ -13,11 +13,7 @@ import {
   ContextMenuTrigger,
 } from "./ui/context-menu";
 import { Eye, EyeOff } from "lucide-react";
-import {
-  hideDeadline,
-  syncDeadlines,
-  UnhideDeadline,
-} from "@/app/actions/deadlines";
+import { hideDeadline, UnhideDeadline } from "@/app/actions/deadlines";
 import { toast } from "sonner";
 import HiddenDeadlinesToggle from "./deadlines/hidden-deadlines-toggle";
 import DashboardCalendar from "./dashboad-calendar";
@@ -46,34 +42,28 @@ const Deadlines = ({
   const [selectedRange, setSelectedRange] = React.useState<
     DateRange | undefined
   >();
-  const [syncedDeadlines, setSyncedDeadlines] = React.useState<any[] | null>(
-    null,
-  );
   const [hiddenOverrides, setHiddenOverrides] = React.useState<
     Record<string, boolean>
   >({});
 
-  const effectiveDeadlines = syncedDeadlines ?? incomingDeadlines;
+  const effectiveDeadlines = incomingDeadlines;
 
   React.useEffect(() => {
-    let isMounted = true;
-
     const syncInBackground = async () => {
       if (!icsUrl) return;
 
-      const result = await syncDeadlines(icsUrl, false);
-
-      if (!isMounted || result?.error) return;
-      if (Array.isArray(result.deadlines)) {
-        setSyncedDeadlines(result.deadlines);
+      try {
+        await fetch("/api/sync-ics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ icsUrl }),
+        });
+      } catch {
+        // Silent background sync.
       }
     };
 
     void syncInBackground();
-
-    return () => {
-      isMounted = false;
-    };
   }, [icsUrl]);
 
   if (!effectiveDeadlines || effectiveDeadlines.length === 0) {

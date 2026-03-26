@@ -45,6 +45,7 @@ import { Tooltip, TooltipContent } from "./ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { WeekClasses } from "./week-classes";
 import SessionsList from "./sessions-list";
+import Link from "next/link";
 
 const DAYS_ORDER = [
   "Monday",
@@ -286,7 +287,30 @@ export const Schedule: FC<ScheduleProps> = ({
   }
 
   if (error) {
-    return <div className={cn("p-4 text-red-500", className)}>{error}</div>;
+    return (
+      <div
+        className={cn(
+          "m-6 p-6 border-2 rounded-xl bg-accent/50 backdrop-blur",
+          className,
+        )}
+      >
+        <div className="space-y-3">
+          <p className="font-semibold text-foreground">Group not found 404</p>
+          <p className="text-sm text-muted-foreground">{error}</p>
+          <Link
+            className={cn(
+              "inline-block mt-4 px-4 py-2 rounded-lg",
+              "bg-primary text-primary-foreground hover:bg-primary/90",
+              "transition-colors font-medium text-sm",
+            )}
+            href="https://t.me/ArLaN_XD"
+            target="_blank"
+          >
+            Contact me
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   if (!group) {
